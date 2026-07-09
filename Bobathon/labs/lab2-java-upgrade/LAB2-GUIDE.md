@@ -133,20 +133,46 @@ You can control what Bob does automatically:
 
 ## Exercise 1: Open the Project & Activate Java Modernization Mode
 
+### Objective
+Open the correct project folder in your IDE and switch Bob into Java Modernization mode.
 
-1. Launch your IDE with IBM Bob installed
+### Steps
 
-2. Open the ```2_Java_Upgrade_J8_J21``` project folder
+1. **Launch your IDE** with IBM Bob installed.
 
-3. If the Bob Chat window is not already open, select the Bob icon at the to the left of the search bar at the tope of your IDE.
+2. **Open the project folder** in your IDE.
 
-4. At the bottom of the chat, you'll see the current mode (e.g., "💻 Code" or "❓ Ask"). Click on the current mode name at the bottom of the chat.
+   The project you will be working on is located at:
+   ```
+   Bobathon/labs/lab2-java-upgrade/snapB-java-upgrade
+   ```
 
-5. Select "☕ Java Modernization" from the dropdown menu. You should now be in Java Modernization mode, ready to begin the modernization process.
+   > **Tip:** Go to **File → Open Folder…** and navigate to the `snapB-java-upgrade` directory. Make sure you open **this specific subfolder** as your workspace root — not the parent `lab2-java-upgrade` folder. Bob uses the open workspace to determine which project to analyze.
+
+   Once opened, you should see the following files and folders in your Explorer panel:
+   ```
+   snapB-java-upgrade/
+   ├── pom.xml
+   ├── src/
+   ├── Dockerfile
+   ├── run-liberty.sh
+   └── ...
+   ```
+
+3. **Open the Bob Chat panel.**
+
+   If the Bob Chat window is not already visible, click the Bob icon to the left of the search bar at the top of your IDE.
+
+4. **Switch to Java Modernization mode.**
+
+   At the bottom of the Bob Chat panel, you will see the currently active mode (e.g., `💻 Agent` or `❓ Ask`). Click on that mode name to open the mode selector dropdown.
+
+5. **Select "☕ Java Modernization"** from the dropdown list.
+
+   You should now see `☕ Java Modernization` displayed at the bottom of the chat panel, confirming you are in the correct mode and ready to proceed.
 
 ### Potential Issues
-- **Mode not available?** Ensure your Bob installation is up to date
-- **Can't find mode selector?** Try typing `/mode` to see available modes
+- **Wrong folder opened?** If Bob cannot find your `pom.xml`, close the workspace and re-open the `snapB-java-upgrade` subfolder directly.
 
 ---
 
@@ -190,7 +216,38 @@ Have Bob use the Java Modernization worklfow to analyze your current application
 
 4. **Run the application**
 
-   Prompt Bob to run the Simple Pharmacy application. Follow the URL the Bob provide to view the UI of the local application.
+   You can ask Bob to run the application for you by typing in the chat:
+   > *"Please run the Simple Pharmacy application"*
+
+   Bob will execute the build and start the Liberty server, then provide the URLs to access the UI.
+
+   Alternatively, you can run it manually from inside the `snapB-java-upgrade` folder:
+
+   **Option A — Shell script (recommended):**
+   ```bash
+   # Make the script executable (first time only)
+   chmod +x run-liberty.sh
+
+   # Build and start Liberty
+   ./run-liberty.sh
+   ```
+
+   **Option B — Maven directly:**
+   ```bash
+   mvn clean package
+   mvn liberty:run
+   ```
+
+   The server takes 10–30 seconds to start. Once it is ready, open any of the following URLs in your browser:
+
+   | Page | URL |
+   |------|-----|
+   | Dashboard | http://localhost:9081/simple-pharmacy.war/dashboard |
+   | Prescriptions | http://localhost:9081/simple-pharmacy.war/prescription-list |
+   | Orders | http://localhost:9081/simple-pharmacy.war/order-list |
+   | Medicines | http://localhost:9081/simple-pharmacy.war/medicine-list |
+
+   **To stop the server**, press `Ctrl+C` in the terminal, or run `./stop-liberty.sh` from a separate terminal.
 
 
 ---
