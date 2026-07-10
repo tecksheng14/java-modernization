@@ -1,307 +1,293 @@
-# IBM Bob AI Copilot - UI Modernization Lab Guide (V2)
-## Simple Pharmacy Dashboard - Struts to Angular Migration
+# IBM Bob AI Copilot - Lab 3: Java UI Modernization Workflow
+## Simple Pharmacy — Legacy UI Modernization
 
 ---
 
 ## Table of Contents
 1. [Introduction](#introduction)
 2. [Prerequisites](#prerequisites)
-3. [V2 Feature Highlights](#v2-feature-highlights)
-4. [Setting Up](#setting-up)
-5. [Exercise 1: Run the UI Modernization Workflow](#exercise-1-run-the-ui-modernization-workflow)
-6. [Exercise 2: Verify the Migrated Application](#exercise-2-verify-the-migrated-application)
-7. [Known Issues and Troubleshooting](#known-issues-and-troubleshooting)
-8. [Conclusion](#conclusion)
+3. [Initiating the Java UI Modernization Workflow](#initiating-the-java-ui-modernization-workflow)
+4. [Step-by-Step Exercises](#step-by-step-exercises)
+5. [Troubleshooting](#troubleshooting)
+6. [Conclusion](#conclusion)
 
 ---
 
 # Introduction
 
-### What is UI Modernization?
+### What is the Java UI Modernization Workflow?
 
-UI Modernization migrates a legacy server-rendered frontend (like Struts JSPs) to a modern single-page application (like Angular), with a REST API replacing the traditional action-based backend flow. Typical changes:
-- **Framework migration**: Struts/JSP → Angular
-- **Design system adoption**: raw HTML/CSS → a Material or component library
-- **API layer split**: monolithic action controllers → REST endpoints returning JSON
-- **Dev experience**: hot-reload dev server, TypeScript, component-based structure
+The Java UI Modernization workflow is a guided, AI-assisted process inside IBM Bob that helps teams modernize legacy Java web UIs. In this lab, the workflow is applied to [`snapC-ui-mod`](snapC-ui-mod) — a Simple Pharmacy application whose UI is built on Struts/JSP server-side rendering.
+
+The workflow covers:
+- **Analysis**: Examining the existing Struts/JSP codebase — components, routing, state, data, and layout patterns
+- **Planning**: Producing a modernization plan and presenting target-state options for the UI
+- **Code Generation**: Generating the selected target-state UI and integrating it with the existing application backend
+- **Validation**: Running and testing the modernized UI against the live backend
 
 ## About This Lab
 
-You'll use **Bob V2's Java Modernization workflow** with the **UI Modernization** sub-type to migrate the pharmacy application from Struts to Angular. Both frontend and backend are modernized in a single workflow run.
+You will use IBM Bob to initiate and follow the Java UI Modernization workflow on the [`snapC-ui-mod`](snapC-ui-mod) application. The starting point is:
+- **UI**: Struts/JSP server-side rendering
 
-- **Before**: Liberty Runtime, Java 21, Struts (JSP views)
-- **After**: Liberty Runtime, Java 21, Jakarta EE REST API + Angular 22 SPA (Material AI design system)
+During the workflow, Bob will analyze the application and propose one or more target-state options. You will review those options and choose the one you want Bob to implement.
 
 ## Learning Objectives
 
-By the end of this lab, you will:
-- Configure the UI Modernization workflow with framework, design system, and project paths
-- Observe how Bob adapts its behavior when a REST layer already exists (gap analysis vs full generation)
-- Recognize auto-added features like MicroProfile OpenAPI and Swagger UI
-- Diagnose and fix the known proxy/context path mismatch between the generated frontend and the deployed backend
+By completing this lab, you will:
+- Understand how to initiate and follow the Java UI Modernization workflow in Bob
+- Use Bob to analyze a legacy Struts/JSP application and review target-state options
+- Guide Bob through generating and refining the selected modernized UI
+- Run and test the modernized application end-to-end
 
 ---
 
 # Prerequisites
 
-### 1. IBM Bob IDE (V2)
-- Latest Bob V2 IDE extension installed
-- Bob subscription tier that includes the Java Modernization workflow suite (the Premium package)
+## Required Software
 
-### 2. Terminal Environment (macOS zsh)
-If SDKMAN isn't set up:
+### 1. IBM Bob IDE
+- Ensure you have IBM Bob latest version installed and are logged in
+- Ensure you have access to **Agent mode** (required to initiate the workflow)
+
+### 2. Java and Maven
+The Liberty backend must be built and running for the modernized UI to connect to application data.
+
+**Verify:**
 ```bash
-curl -s "https://get.sdkman.io" | bash
-echo '[[ -s "$HOME/.sdkman/bin/sdkman-init.sh" ]] && source "$HOME/.sdkman/bin/sdkman-init.sh"' >> ~/.zshrc
-source ~/.zshrc
+java -version
+mvn -version
 ```
+You should see Java 17+ and Maven 3.x.
 
-### 3. Java 21
-The `snapC-ui-mod` starting state is Java 21. Install with:
-```bash
-sdk list java | grep " 21\."
-```
-Confirmed working on Apple Silicon: `21.0.11-zulu`.
-```bash
-sdk install java 21.0.11-zulu
-sdk use java 21.0.11-zulu
-java -version   # should show 21
-```
-
-### 4. Maven
-```bash
-sdk install maven
-```
-
-### 5. Node.js and npm
-Node.js 18+ and npm 9+. On macOS:
-```bash
-brew install node
-node --version
-npm --version
-```
-
-### 6. Angular CLI (with the npm user-prefix fix)
-
-`npm install -g @angular/cli` will fail with EACCES on Homebrew-installed Node unless you route npm global installs to a user-owned directory first. Run these once:
-```bash
-mkdir -p ~/.npm-global
-npm config set prefix ~/.npm-global
-echo 'export PATH=~/.npm-global/bin:$PATH' >> ~/.zshrc
-source ~/.zshrc
-```
-
-Then install Angular CLI:
-```bash
-npm install -g @angular/cli
-ng version
-```
-
-### 7. Restart Bob
-Fully quit and restart Bob after installing Maven and Node so it picks up the tools.
+### 3. Additional tools based on selected target state
+The workflow may recommend a target state that requires additional tools or runtimes. Install those tools if Bob indicates they are needed for the option you select.
 
 ---
 
-# V2 Feature Highlights
+# Initiating the Java UI Modernization Workflow
 
-Worth watching for and demonstrating during this lab:
+## Opening the Workspace
 
-- **UI Modernization as a sub-type**: it's not a standalone workflow; it lives inside the Java Modernization workflow. The workflow surface consolidates all four sub-types (Java Upgrade, Liberty Replatforming, UI Modernization, Java Unit Testing) into one entry point.
-- **Structured setup screen**: a dedicated config screen with Frontend/Backend toggles, framework dropdowns (Angular, React, Vue), design system options (including "Material AI"), backend framework options (Jakarta EE style REST services, Spring Boot, Quarkus), and project path fields.
-- **Autonomous state detection**: Bob detects that Liberty Replatforming isn't needed (application is already on Liberty) and greys that sub-type option out. When it detects an existing JAX-RS layer, it switches from full-generation mode into gap-analysis mode.
-- **Auto-added Swagger UI**: the workflow adds MicroProfile OpenAPI and Swagger UI at `/openapi/ui/` — instant API documentation.
-- **Design system adoption**: Bob rewrites plain HTML components into proper Angular Material (or Material AI) components with consistent styling.
-- **Iterative build validation**: after generation, Bob compiles the frontend and backend and iterates to fix build errors before declaring the workflow complete.
+1. Open the [`snapC-ui-mod`](snapC-ui-mod) folder in Bob as your active workspace.
+2. Open the Bob Chat interface.
+
+## Switching to Agent Mode
+
+The Java UI Modernization workflow runs in Bob's **Agent mode**, which provides:
+- Multi-file read and write operations
+- Complex multi-step workflow execution
+- Deep knowledge of legacy Java UI patterns and modern UI modernization approaches
+
+**To switch to Agent mode:**
+1. Click on the current mode indicator at the bottom of the Bob chat window.
+2. Select **Agent** from the dropdown.
+
+![agent_mode](images_lab3UImodernization/agent_mode.png)
+
+## Triggering the Workflow
+
+In the Bob chat window, type the following to start the workflow:
+
+```
+I want to modernize this Java application UI. Help me execute the Java UI Modernization workflow.
+```
+
+Bob will initiate the Java UI Modernization workflow and begin with the analysis phase.
+
+![ui_workflow](images_lab3UImodernization/ui_workflow.png)
 
 ---
 
-# Setting Up
+# Step-by-Step Exercises
 
-### 1. Open the snapshot subfolder as your project root
-```
-Bobathon/labs/lab3-ui-modernization/snapC-ui-mod
-```
-Use the `snapC-*` subfolder, not the parent `lab3-*` folder.
+1. **Open Bob Chat**
+   - Click the Bob icon in the IDE sidebar if the chat is not already open.
 
-### 2. Confirm Agent mode
-Bob's chat panel should show **Agent** at the bottom.
+2. **Switch to Agent Mode**
+   - Click the current mode indicator at the bottom of chat.
+   - Select **Agent** from the dropdown and confirm if prompted.
 
-### 3. Create the frontend folder before starting the workflow
+3. **Initiate the Workflow**
+   - In the Bob chat, enter:
+     ```
+     I want to modernize this Java application UI. Help me execute the Java UI Modernization workflow.
+     ```
 
-**Important**: the UI Modernization workflow requires both the frontend and backend folders to exist before you click Setup Project. The backend folder is already there (the snap root itself); the frontend folder isn't. Create it now:
+4. **Review the Analysis and Target-State Options**
 
-```bash
-cd Bobathon/labs/lab3-ui-modernization/snapC-ui-mod
-mkdir frontend
-```
+   Bob will analyze the existing application and present target-state options for modernizing the UI. Review the proposed options and choose the one that best fits your goals for the lab.
 
-If you skip this, the workflow stalls with no clear error.
+![ui_options](images_lab3UImodernization/ui_options.png)
 
----
 
-# Exercise 1: Run the UI Modernization Workflow
+5. **Follow and Guide the Workflow**
 
-### Steps
+   After selecting a target state, Bob will continue the modernization workflow and ask for your approval at key points. You are encouraged to prompt Bob throughout the process. Useful follow-up prompts include:
+   - Asking Bob to explain a generated file or component
+   - Requesting changes to the layout or structure
+   - Asking Bob to troubleshoot build or runtime errors
+   - Asking for clarification on a modernization decision
 
-1. **Start the workflow**
-   - Click **Start** on the Java Modernization workflow in Bob's chat panel.
+6. **Start the Backend**
 
-2. **Analyze Project screen**
-   - Confirm the auto-populated project path points at `snapC-ui-mod`.
-   - Leave "Custom build command" blank.
-   - Click **Continue**.
+   Once Bob has generated the modernized UI, start the Liberty backend so you can validate the full application:
 
-3. **Modernization Type screen**
-   - You'll see four sub-types. **Liberty Replatforming** is greyed out with "Application is already using Liberty" — that's expected.
-   - Select **UI Modernization**.
-   - Leave **Enable Git Flow** unchecked.
-   - Click **Continue**.
-
-4. **Analyze Application Architecture**
-   - Bob analyzes the codebase (Struts actions, JSPs, existing REST classes, models). This is a read-only pass.
-   - Click **Continue** when prompted.
-
-5. **Setup UI Modernization Project screen**
-   Fill in these fields:
-
-   **Modernization Configuration**
-   - Check **Frontend Modernization**
-   - Check **Backend Modernization**
-
-   **Frontend**
-   - **Frontend Framework**: `Angular`
-   - **Frontend Design System**: `Material AI`
-   - **Frontend Project Path**: absolute path to your `snapC-ui-mod/frontend/` folder
-
-   **Backend**
-   - **Backend Framework**: `Jakarta EE style REST services` (matches Liberty)
-   - **Backend Project Path**: absolute path to `snapC-ui-mod/` itself
-
-   Click **Setup Project**.
-
-6. **Iterative generation and approval**
-   - Bob generates the Angular project (models, services, components, routing, config).
-   - It rewrites plain HTML components into Material components.
-   - It generates or enhances the backend JAX-RS resources with input validation and OpenAPI annotations.
-   - Any pom.xml changes (adding MicroProfile OpenAPI, adjusting server.xml features) surface as approval prompts. Approve them.
-
-7. **Build validation**
-   - Bob runs `mvn clean compile` and `ng build` to confirm both sides compile cleanly.
-   - Total cost is typically around 5–10 Bob coins for this lab.
-
-8. **Workflow summary**
-   The final screen shows what was built, files created, and per-task cost/token stats.
-
----
-
-# Exercise 2: Verify the Migrated Application
-
-### 1. Start the backend
-
-Open a terminal in the snap folder:
-```bash
-cd Bobathon/labs/lab3-ui-modernization/snapC-ui-mod
-mvn liberty:run
-```
-
-Wait for `The defaultServer server is ready to run a smarter planet`.
-
-### 2. Confirm the backend REST API works
-
-In a separate terminal:
-```bash
-curl -i http://localhost:9081/simple-pharmacy.war/api/dashboard
-```
-
-You should get HTTP 200 with a JSON body containing prescriptions and orders.
-
-### 3. Start the Angular dev server
-
-In a second terminal:
-```bash
-cd Bobathon/labs/lab3-ui-modernization/snapC-ui-mod/frontend
-npm start
-```
-
-Wait for `Application bundle generation complete`.
-
-### 4. Open the app in a browser
-
-Open `http://localhost:4200/`.
-
-### 5. Verify
-
-Click through: Dashboard, Prescriptions, Orders, Medicines. All pages should render data.
-
-**If the dashboard is stuck loading and shows no data**, see [Known Issues](#known-issues-and-troubleshooting) — you've likely hit the proxy/context path mismatch.
-
-### 6. Explore the auto-added Swagger UI
-
-Open `http://localhost:9081/openapi/ui/` to see the Swagger UI Bob generated with your API documented.
-
----
-
-# Known Issues and Troubleshooting
-
-## Known workflow bug: proxy/context path mismatch
-
-**Symptom**: Angular loads, but every page is stuck loading with no data. Browser DevTools Network tab shows `/api/*` requests returning HTTP 404, and the response body is Liberty's "Context Root Not Found" HTML page.
-
-**Cause**: Bob's generated `proxy.config.json` sets `pathRewrite: "^/api" → "/simple-pharmacy/api"`, but Liberty actually deploys the WAR at `/simple-pharmacy.war/`. The two don't match, so every proxied request 404s.
-
-**Fix**:
-1. Open `snapC-ui-mod/frontend/proxy.config.json`.
-2. Change:
-   ```json
-   "pathRewrite": {
-     "^/api": "/simple-pharmacy/api"
-   }
+   ```bash
+   # From snapC-ui-mod
+   ./run-liberty.sh       # macOS/Linux
+   run-liberty.bat        # Windows
    ```
-   to:
-   ```json
-   "pathRewrite": {
-     "^/api": "/simple-pharmacy.war/api"
-   }
+
+   See [`README-AUTOMATION.md`](snapC-ui-mod/README-AUTOMATION.md) for full backend startup and stop instructions.
+
+7. **Validate the Modernized UI**
+
+   Once Bob completes the workflow, ask Bob to help run the application:
    ```
-3. Save, stop `npm start` (Ctrl+C), restart with `npm start`.
-4. Hard-refresh the browser (Cmd+Shift+R).
+   Help me run the modernized application UI
+   ```
 
-## Issue: npm global install fails with EACCES
+   If the selected target state requires additional commands or tools, follow the instructions Bob provides for that option.
 
-**Symptom**: `npm install -g @angular/cli` reports "The operation was rejected by your operating system."
+### Expected Outcome
 
-**Solution**: Run the npm user-prefix setup from the [Prerequisites](#prerequisites) section. Do NOT use sudo.
+- A successfully generated modernized UI based on the selected target-state option
+- Core application pages and navigation working correctly
+- The modernized UI able to retrieve data from the Liberty backend
+- A validated end-to-end modernization result for the selected target state
 
-## Issue: `SRVE0321E: The [struts2] filter did not load during start up`
+---
 
-**Symptom**: Struts filter warning in Liberty logs at startup.
+# Troubleshooting
 
-**Solution**: Safe to ignore. Doesn't affect runtime behavior.
+## Issue 1: Workflow Request Failed
 
-## Issue: OpenAPI validation warnings (CWWKO1650E)
+**Symptom:**
+```
+{"apiProtocol":"openai"}
+```
 
-**Symptom**: Liberty logs show warnings like "The Path Item Object must contain a valid path" for the OPTIONS operation on paths with `{id}` parameters.
+**Solution:**
+Select "Retry" in the Bob chat window.
 
-**Solution**: Safe to ignore for lab purposes. The workflow's auto-generated CORS filter OPTIONS handlers don't declare their path parameters in OpenAPI annotations. It doesn't affect API functionality.
+---
 
-## Issue: Bob re-analyzes without applying a requested fix
+## Issue 2: Backend Connection Issues
 
-**Symptom**: You tell Bob about a bug in the chat and ask it to fix, but Bob just re-reads files and reports "build looks clean" without touching anything.
+**Symptom:**
+The modernized UI cannot connect to the backend API. Errors may include:
+- `HTTP Error: Connection refused`
+- `Failed to load resource: net::ERR_CONNECTION_REFUSED`
+- `CORS policy error`
+- API calls returning 404 or timeout errors
 
-**Solution**: Bob V2's follow-up conversation flow is unreliable for applied fixes. Apply the fix manually, then move on.
+**Root Cause:**
+The Liberty backend is not running on the expected local endpoint, so the modernized UI cannot retrieve application data.
+
+### Solution A: Start the Backend
+
+```bash
+cd snapC-ui-mod
+
+# Full build and start (first time or after code changes)
+./run-liberty.sh       # macOS/Linux
+run-liberty.bat        # Windows
+
+# Quick start (already built)
+./quick-start.sh
+```
+
+Verify the backend is up:
+```bash
+curl http://localhost:9081/simple-pharmacy.war/api/dashboard
+```
+
+### Solution B: Stop a Stale Server
+
+If port 9081 is already occupied:
+```bash
+./stop-liberty.sh      # macOS/Linux
+stop-liberty.bat       # Windows
+make stop              # using Make
+mvn liberty:stop       # using Maven
+```
+
+### Solution C: Review Target-State Runtime Instructions
+
+If the generated UI does not start or connect correctly, ask Bob to explain the runtime steps for the selected target state and verify that any required configuration, ports, proxies, or environment settings were applied correctly.
+
+### Solution D: CORS Configuration
+
+If CORS errors appear when hitting the backend directly, verify [`src/main/java/com/pharmacy/api/CorsFilter.java`](snapC-ui-mod/src/main/java/com/pharmacy/api/CorsFilter.java) includes:
+
+```java
+response.setHeader("Access-Control-Allow-Origin", "*");
+response.setHeader("Access-Control-Allow-Methods", "GET, POST, PUT, DELETE, OPTIONS");
+response.setHeader("Access-Control-Allow-Headers", "Content-Type, Authorization");
+```
+
+Restart the backend after any CORS changes.
+
+### Verification After Applying a Fix
+
+1. Check the browser console (F12) for remaining errors.
+2. Navigate through the main application pages.
+3. Verify data loads correctly in the modernized UI.
+
+---
+
+## Getting Help
+
+### During the Lab
+1. **Ask Bob** — provide the full error message for the most accurate assistance
+2. **Ask Your Instructor** — raise your hand if you are stuck
+3. **Collaborate** — discuss with classmates
+
+### Bob-Specific Tips
+- Be specific — include file names, error text, and what you already tried
+- Ask Bob to explain its reasoning when reviewing generated code
+- Request step-by-step guidance for complex debugging tasks
 
 ---
 
 # Conclusion
 
-You've completed the UI Modernization lab using Bob V2's Java Modernization workflow. You should now be comfortable with:
+You have completed Lab 3 — the Java UI Modernization workflow applied to the Simple Pharmacy application.
 
-- ✅ Configuring the UI Modernization workflow (frontend, backend, framework, design system, paths)
-- ✅ Pre-creating the frontend folder before Setup Project
-- ✅ Interpreting Bob's adaptive behavior when a REST layer already exists
-- ✅ Recognizing auto-added features (Swagger UI, Material components)
-- ✅ Diagnosing and fixing the proxy/context path mismatch
+You should now be able to:
 
-Ready for Lab 4 (Unit Test Generation) next.
+✅ Initiate the Java UI Modernization workflow in IBM Bob  
+✅ Review and choose from the target-state options proposed by Bob  
+✅ Guide Bob through generating and validating a modernized UI for the selected target state  
+
+## Key Takeaways
+
+1. **Java UI Modernization Workflow** — Bob's guided workflow helps modernize legacy Java UIs with minimal manual setup
+2. **Target-State Choice** — The workflow can present multiple UI modernization options for the user to evaluate
+3. **Phased Approach** — Analysis → Planning → Generation → Validation produces predictable, reviewable results
+4. **Backend Continuity** — The existing Liberty backend continues to support the modernized UI during validation
+5. **Iterative Guidance** — Users can guide Bob throughout the workflow to refine the generated result
+
+## Next Steps (Optional)
+
+> The following are optional extensions if you have additional time or want to deepen your exploration.
+
+1. **Optimize the Generated UI**
+   ```
+   Optimize the generated UI for the selected target state
+   ```
+
+2. **Review Code Quality**
+   ```
+   Review the migrated code for architecture, maintainability, error handling, code organization, and documentation completeness
+   ```
+
+3. **Create a Modernization Summary**
+   ```
+   Create a MIGRATION_SUMMARY.md document that includes what was modernized, the selected target state, key architectural changes, known issues, and next steps
+   ```
 
 ---
+
+**Thank you for completing Lab 3!** You have used IBM Bob's Java UI Modernization workflow to analyze a legacy Java UI, choose a target state, and validate the resulting modernization outcome end-to-end.

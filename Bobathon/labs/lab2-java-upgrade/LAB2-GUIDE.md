@@ -117,7 +117,7 @@ Look for **Java Modernization** in Bob's chat panel workflow list.
 ### Steps
 
 1. **Start the workflow**
-   - Click **Start** on the Java Modernization workflow in Bob's chat panel.
+   - Click **Start** on the Java Modernization workflow in Bob's chat panel under its workflows (accessible via the left-most play button on the top right corner).
 
 2. **Analyze Project screen**
    - Confirm the auto-populated project path points at `snapB-java-upgrade`.

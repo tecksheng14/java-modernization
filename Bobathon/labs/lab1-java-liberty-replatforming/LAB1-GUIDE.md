@@ -134,7 +134,7 @@ Use Bob's Java Modernization workflow to migrate the pharmacy app from Tradition
 ### Steps
 
 1. **Start the workflow**
-   - In Bob's chat panel, click **Start** on the Java Modernization workflow.
+   - In Bob's chat panel, select the workflows button on the top right corner (left-most play icon) and click **Start** on the Java Modernization workflow.
 
 2. **Analyze Project screen**
    - The project path should auto-populate to the snapA folder.

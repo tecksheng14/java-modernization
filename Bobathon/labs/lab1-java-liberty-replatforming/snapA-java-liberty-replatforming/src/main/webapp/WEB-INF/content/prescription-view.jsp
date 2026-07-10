@@ -212,7 +212,7 @@
         <div class="actions">
             <a href="<s:url action='prescription-list'/>" class="btn btn-secondary">Back to Prescriptions</a>
             <s:if test="prescription.status == 'VALIDATED'">
-                <a href="<s:url action='order-create'><s:param name='prescriptionId' value='prescription.id'/></s:url>" class="btn btn-success">Create Order</a>
+                <a href="<s:url action='order-createFromPrescription'><s:param name='prescriptionId' value='prescription.id'/></s:url>" class="btn btn-success">Create Order</a>
             </s:if>
         </div>
     </div>
