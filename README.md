@@ -1,8 +1,5 @@
 # Bobathon - Java Modernization Labs
 
-## Important note for Bob v2
-This repo was originally built for Bob v1. We are in the process of updating the labs to showcase v2 premium package workflows.
-
 ## 🚀 New to This Repository?
 
 **Start here:** [GETTING_STARTED.md](Bobathon/GETTING_STARTED.md) - Complete guide to get up and running in 10 minutes!
@@ -10,11 +7,6 @@ This repo was originally built for Bob v1. We are in the process of updating the
 This repository contains **8 hands-on labs** for learning AI-assisted application modernization:
 - **6 Java Modernization Labs** - Transform legacy Java applications step-by-step
 - **2 Figma Integration Labs** - Learn to integrate IBM Bob with Figma for UI design
-
-**Links to Demos:**
-- Java Modernization Demos: [https://ibm.ent.box.com/folder/365179537734](https://ibm.ent.box.com/folder/365179537734)
-- Figma Editor Access Lab: [https://ibm.ent.box.com/folder/373365438389](https://ibm.ent.box.com/folder/373365438389)
-- Figma NonEditor Access Lab: [https://ibm.ent.box.com/folder/373364692035](https://ibm.ent.box.com/folder/373364692035)
 ---
 
 ## 📑 Table of Contents
@@ -54,7 +46,6 @@ This repository contains **8 hands-on labs** for learning AI-assisted applicatio
 - [Repository Structure](#repository-structure)
 - [Quick Start Guide](#quick-start-guide)
 - [Tips for Success](#tips-for-success)
-- [Contributing](#contributing)
 
 ---
 Welcome to the Bobathon Java Modernization workshop! This repository contains hands-on labs that demonstrate how to use **IBM Bob AI Copilot** to modernize legacy Java applications through a progressive modernization journey.
@@ -581,11 +572,6 @@ By completing these labs, you will:
 - [Liberty Documentation](https://openliberty.io/docs/)
 - [Java 21 Release Notes](https://openjdk.org/projects/jdk/21/)
 - [Angular Documentation](https://angular.io/docs)
-
-### Related Materials
-- Demo Video: [Simple Pharmacy Demo](https://ibm.ent.box.com/folder/365179537734)
-- Webisode: [Java Modernization](https://ec.yourlearning.ibm.com/w3/series/10476203?layout=grid)
-
 ---
 
 ## Repository Structure
@@ -663,12 +649,6 @@ bobathon/
 - **Ask Bob for explanations** when you don't understand something
 - **Take your time** - modernization is a learning process
 - **Experiment** - each snapshot is independent, so feel free to try different approaches
-
----
-
-## Contributing
-
-This is a workshop repository. If you find issues or have suggestions for improvements, please reach out to the workshop organizers. We welcome your contributions!
 
 ---
 
