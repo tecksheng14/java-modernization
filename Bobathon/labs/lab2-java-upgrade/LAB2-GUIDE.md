@@ -133,7 +133,7 @@ Look for **Java Modernization** in Bob's chat panel workflow list.
    Fill in three fields:
    - **Java Distribution**: `Semeru (IBM)` — IBM-preferred.
    - **Java Version**: `21` — target LTS.
-   - **Jakarta EE Version**: `Jakarta EE 10` — the best fit for Java 21 + Struts 7.x.
+   - **Jakarta EE Version**: `Do Not upgrade`
 
    Click **Continue**. Bob will install Semeru Java 21 automatically if it's not present.
 
