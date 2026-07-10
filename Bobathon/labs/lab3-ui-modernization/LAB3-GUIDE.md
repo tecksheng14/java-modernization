@@ -1,4 +1,4 @@
-# IBM Bob AI Copilot - Frontend Modernization Lab Guide
+# IBM Bob AI Copilot - UI Modernization Lab Guide (V2)
 ## Simple Pharmacy Dashboard - Struts to Angular Migration
 
 ---
@@ -6,370 +6,302 @@
 ## Table of Contents
 1. [Introduction](#introduction)
 2. [Prerequisites](#prerequisites)
-3. [Frontend Migration with Bob's Advanced Mode](#frontend-migration-with-bobs-advanced-mode)
-4. [Step-by-Step Exercises](#step-by-step-exercises)
-5. [Troubleshooting](#troubleshooting)
-6. [Conclusion](#conclusion)
+3. [V2 Feature Highlights](#v2-feature-highlights)
+4. [Setting Up](#setting-up)
+5. [Exercise 1: Run the UI Modernization Workflow](#exercise-1-run-the-ui-modernization-workflow)
+6. [Exercise 2: Verify the Migrated Application](#exercise-2-verify-the-migrated-application)
+7. [Known Issues and Troubleshooting](#known-issues-and-troubleshooting)
+8. [Conclusion](#conclusion)
 
 ---
 
 # Introduction
 
-### What is Frontend Modernization?
+### What is UI Modernization?
 
-Frontend Modernization is the process of upgrading or migrating frontend applications to modern frameworks and patterns. This typically involves:
-- **Framework Migration**: Moving from one framework (like Struts) to another (like Angular)
-- **Architecture Updates**: Implementing modern patterns and best practices
-- **Dependency Updates**: Modernizing libraries and tooling to current versions
-- **Code Transformation**: Adapting components, services, and state management to the new framework
+UI Modernization migrates a legacy server-rendered frontend (like Struts JSPs) to a modern single-page application (like Angular), with a REST API replacing the traditional action-based backend flow. Typical changes:
+- **Framework migration**: Struts/JSP → Angular
+- **Design system adoption**: raw HTML/CSS → a Material or component library
+- **API layer split**: monolithic action controllers → REST endpoints returning JSON
+- **Dev experience**: hot-reload dev server, TypeScript, component-based structure
 
 ## About This Lab
 
-In this lab, you'll use IBM Bob's **Advanced mode** to migrate a pharmacy management application's frontend from Struts to Angular. The application currently uses:
-- **Frontend Framework**: Struts
+You'll use **Bob V2's Java Modernization workflow** with the **UI Modernization** sub-type to migrate the pharmacy application from Struts to Angular. Both frontend and backend are modernized in a single workflow run.
 
-You'll migrate it to:
-- **Frontend Framework**: Angular 19 (standalone components)
-
+- **Before**: Liberty Runtime, Java 21, Struts (JSP views)
+- **After**: Liberty Runtime, Java 21, Jakarta EE REST API + Angular 22 SPA (Material AI design system)
 
 ## Learning Objectives
 
-By completing this lab, you will learn how to use Bob's Advanced mode to:
-- Analyze existing Struts applications and plan migrations
-- Create Angular project structure with modern patterns
-- Migrate Struts components to Angular standalone components
-- Test and validate the migrated application
+By the end of this lab, you will:
+- Configure the UI Modernization workflow with framework, design system, and project paths
+- Observe how Bob adapts its behavior when a REST layer already exists (gap analysis vs full generation)
+- Recognize auto-added features like MicroProfile OpenAPI and Swagger UI
+- Diagnose and fix the known proxy/context path mismatch between the generated frontend and the deployed backend
 
 ---
 
 # Prerequisites
 
-## Required Software
+### 1. IBM Bob IDE (V2)
+- Latest Bob V2 IDE extension installed
+- Bob subscription tier that includes the Java Modernization workflow suite (the Premium package)
 
-Before starting this lab, ensure you have the following installed:
-
-### 1. IBM Bob IDE
-- Ensure you have IBM Bob latest version installed
-- Login through Bob to get connected
-- Ensure you have access to **Advanced mode** (required for this lab)
-
-### 2. Node.js and npm
-Node.js is required for Angular development.
-
-**Installation Instructions:**
-- Download from: https://nodejs.org/ (LTS version recommended)
-- Or use a version manager like nvm:
-  ```bash
-  # Install nvm (macOS/Linux)
-  curl -o- https://raw.githubusercontent.com/nvm-sh/nvm/v0.39.0/install.sh | bash
-  
-  # Install Node.js LTS
-  nvm install --lts
-  nvm use --lts
-  ```
-
-**Verify Installation:**
+### 2. Terminal Environment (macOS zsh)
+If SDKMAN isn't set up:
 ```bash
+curl -s "https://get.sdkman.io" | bash
+echo '[[ -s "$HOME/.sdkman/bin/sdkman-init.sh" ]] && source "$HOME/.sdkman/bin/sdkman-init.sh"' >> ~/.zshrc
+source ~/.zshrc
+```
+
+### 3. Java 21
+The `snapC-ui-mod` starting state is Java 21. Install with:
+```bash
+sdk list java | grep " 21\."
+```
+Confirmed working on Apple Silicon: `21.0.11-zulu`.
+```bash
+sdk install java 21.0.11-zulu
+sdk use java 21.0.11-zulu
+java -version   # should show 21
+```
+
+### 4. Maven
+```bash
+sdk install maven
+```
+
+### 5. Node.js and npm
+Node.js 18+ and npm 9+. On macOS:
+```bash
+brew install node
 node --version
 npm --version
 ```
 
-You should see Node.js v18+ and npm v9+
+### 6. Angular CLI (with the npm user-prefix fix)
 
-### 3. Angular CLI
-After installing Node.js, install the Angular CLI globally:
-
+`npm install -g @angular/cli` will fail with EACCES on Homebrew-installed Node unless you route npm global installs to a user-owned directory first. Run these once:
 ```bash
-npm install -g @angular/cli
+mkdir -p ~/.npm-global
+npm config set prefix ~/.npm-global
+echo 'export PATH=~/.npm-global/bin:$PATH' >> ~/.zshrc
+source ~/.zshrc
 ```
 
-**Verify Installation:**
+Then install Angular CLI:
 ```bash
+npm install -g @angular/cli
 ng version
 ```
 
-You should see Angular CLI version information.
-
-## Important: Understanding Bob's Advanced Mode
-
-This lab requires Bob's **Advanced mode**, which provides:
-- **Extended Context**: Ability to work with larger codebases
-- **Multi-file Operations**: Simultaneous reading and editing of multiple files
-- **Complex Workflows**: Support for multi-step migration processes
-- **Framework Knowledge**: Deep understanding of both Struts and Angular patterns
-
-**To access Advanced mode:**
-1. Open Bob's chat interface
-2. Click on the current mode indicator at the bottom
-3. Select "🚀 Advanced" from the mode dropdown
-4. Confirm you want to switch to Advanced mode
+### 7. Restart Bob
+Fully quit and restart Bob after installing Maven and Node so it picks up the tools.
 
 ---
 
-# Frontend Migration with Bob's Advanced Mode
+# V2 Feature Highlights
 
-## Overview of Bob's Advanced Mode for Frontend Migration
+Worth watching for and demonstrating during this lab:
 
-IBM Bob's Advanced mode provides powerful capabilities for framework migrations:
-
-### Key Features for Migration:
-1. **Intelligent Analysis**: Bob can analyze the Struts codebase, examining component structure, state management, routing, API integration, and styling approaches. This comprehensive analysis provides insight into the application's architecture for the migration task.
-
-2. **Migration Planning**: Bob creates a detailed migration plan that maps Struts components to Angular equivalents and designs service architecture, routing strategy, and dependency management. The plan also includes a comprehensive testing approach to ensure successful migration.
-
-3. **Automated Code Generation**: Bob generates Angular code including standalone components with TypeScript, services with RxJS observables, and models/interfaces. It also creates routing configuration and module setup for the complete application structure.
-
-4. **Iterative Refinement**: Bob works with you to reeview generated code, make adjustments based on your feedback, and debug any issues or errors
+- **UI Modernization as a sub-type**: it's not a standalone workflow; it lives inside the Java Modernization workflow. The workflow surface consolidates all four sub-types (Java Upgrade, Liberty Replatforming, UI Modernization, Java Unit Testing) into one entry point.
+- **Structured setup screen**: a dedicated config screen with Frontend/Backend toggles, framework dropdowns (Angular, React, Vue), design system options (including "Material AI"), backend framework options (Jakarta EE style REST services, Spring Boot, Quarkus), and project path fields.
+- **Autonomous state detection**: Bob detects that Liberty Replatforming isn't needed (application is already on Liberty) and greys that sub-type option out. When it detects an existing JAX-RS layer, it switches from full-generation mode into gap-analysis mode.
+- **Auto-added Swagger UI**: the workflow adds MicroProfile OpenAPI and Swagger UI at `/openapi/ui/` — instant API documentation.
+- **Design system adoption**: Bob rewrites plain HTML components into proper Angular Material (or Material AI) components with consistent styling.
+- **Iterative build validation**: after generation, Bob compiles the frontend and backend and iterates to fix build errors before declaring the workflow complete.
 
 ---
 
-# Step-by-Step Exercises
+# Setting Up
 
-1. **Open Bob Chat Interface**
-   - If the Bob Chat window is not already open, click the Bob icon in your IDE's sidebar
-
-2. **Switch to Bob's Advanced Mode**
-   - Click on the current mode name at the bottom of the chat
-   - Select "🚀 Advanced" from the dropdown menu
-   - Confirm the mode switch if prompted
-
-3. **Use Bob to initiate migration**
-   
-   In Bob's chat, type:
-   ```
-   I want to migrate this Struts application to utilize an Angular framework. Help me execute this migration. Create the frontend UI.
-   ```
-
-4. Bob will walk you through and complete the migration process, allowing you to approve tasks. Along the way, you can and should prompt Bob with specific questions or requests to guide the migration process. These can include:
-   - Asking Bob to troubleshoot errors
-   - Requesting specific code changes
-   - Asking for clarification on migration steps
-etc.
-
-
-5. **Use Bob for testing**
-
-   Once the application the is migrated to Angular, if not already suggested to do so, ask Bob to test the application by running it with the prompt:
-   ```
-   Help me run the migrated Angular application
-   ```
-
-
-### Expected Outcome
-- Fully functional Angular application
-- All features working correctly
-- Optimized performance
-- Clean, maintainable code
-- Complete documentation
-
----
-
-# Troubleshooting
-
-## Issue 1: API Request Failed
-
-**Symptom:**
+### 1. Open the snapshot subfolder as your project root
 ```
-{"apiProtocol":"openai"}
+Bobathon/labs/lab3-ui-modernization/snapC-ui-mod
+```
+Use the `snapC-*` subfolder, not the parent `lab3-*` folder.
+
+### 2. Confirm Agent mode
+Bob's chat panel should show **Agent** at the bottom.
+
+### 3. Create the frontend folder before starting the workflow
+
+**Important**: the UI Modernization workflow requires both the frontend and backend folders to exist before you click Setup Project. The backend folder is already there (the snap root itself); the frontend folder isn't. Create it now:
+
+```bash
+cd Bobathon/labs/lab3-ui-modernization/snapC-ui-mod
+mkdir frontend
 ```
 
-**Solution:**
-Select "Retry" in the Bob chat window
+If you skip this, the workflow stalls with no clear error.
 
 ---
 
-## Issue 2: Backend Connection Issues
+# Exercise 1: Run the UI Modernization Workflow
 
-**Symptom:**
-The Angular frontend cannot connect to the backend API. You may see errors like:
-- `HTTP Error: Connection refused`
-- `Failed to load resource: net::ERR_CONNECTION_REFUSED`
-- `CORS policy error`
-- API calls returning 404 or timeout errors
+### Steps
 
-**Root Cause:**
-The Angular application is configured to connect to `http://localhost:9081/simple-pharmacy.war/api` in the `pharmacy-api.service.ts` file, but the backend server may not be running on this port or path.
+1. **Start the workflow**
+   - Click **Start** on the Java Modernization workflow in Bob's chat panel.
 
-**Solutions:**
+2. **Analyze Project screen**
+   - Confirm the auto-populated project path points at `snapC-ui-mod`.
+   - Leave "Custom build command" blank.
+   - Click **Continue**.
 
-### Solution A: Verify Backend Server is Running
+3. **Modernization Type screen**
+   - You'll see four sub-types. **Liberty Replatforming** is greyed out with "Application is already using Liberty" — that's expected.
+   - Select **UI Modernization**.
+   - Leave **Enable Git Flow** unchecked.
+   - Click **Continue**.
 
-1. **Check if the Liberty server is running:**
-   ```bash
-   # Navigate to the backend directory
-   cd Bobathon/labs/lab3-ui-modernization/snapC-ui-mod
-   
-   # Check if Maven/Liberty server is running
-   mvn liberty:status
-   ```
+4. **Analyze Application Architecture**
+   - Bob analyzes the codebase (Struts actions, JSPs, existing REST classes, models). This is a read-only pass.
+   - Click **Continue** when prompted.
 
-2. **Start the backend server if not running:**
-   ```bash
-   # Start the Liberty server
-   mvn liberty:run
-   ```
-   
-   Wait until you see a message indicating the server has started successfully (typically shows "server is ready to run a smarter planet").
+5. **Setup UI Modernization Project screen**
+   Fill in these fields:
 
-3. **Verify the backend is accessible:**
-   Open a browser or use curl to test:
-   ```bash
-   curl http://localhost:9081/simple-pharmacy.war/api/dashboard
-   ```
-   
-   You should receive a JSON response with dashboard data.
+   **Modernization Configuration**
+   - Check **Frontend Modernization**
+   - Check **Backend Modernization**
 
-### Solution B: Update Frontend API Configuration
+   **Frontend**
+   - **Frontend Framework**: `Angular`
+   - **Frontend Design System**: `Material AI`
+   - **Frontend Project Path**: absolute path to your `snapC-ui-mod/frontend/` folder
 
-If your backend is running on a different port or path, update the API URL in the Angular service:
+   **Backend**
+   - **Backend Framework**: `Jakarta EE style REST services` (matches Liberty)
+   - **Backend Project Path**: absolute path to `snapC-ui-mod/` itself
 
-1. **Open the pharmacy API service file:**
-   ```
-   Bobathon/labs/lab3-ui-modernization/snapC-ui-mod/src/main/frontend/src/app/services/pharmacy-api.service.ts
-   ```
+   Click **Setup Project**.
 
-2. **Update the `apiUrl` property (line 53):**
-   ```typescript
-   // Change from:
-   private apiUrl = 'http://localhost:9081/simple-pharmacy.war/api';
-   
-   // To match your backend configuration, for example:
-   private apiUrl = 'http://localhost:9080/simple-pharmacy/api';
-   // or
-   private apiUrl = 'http://localhost:8080/api';
-   ```
+6. **Iterative generation and approval**
+   - Bob generates the Angular project (models, services, components, routing, config).
+   - It rewrites plain HTML components into Material components.
+   - It generates or enhances the backend JAX-RS resources with input validation and OpenAPI annotations.
+   - Any pom.xml changes (adding MicroProfile OpenAPI, adjusting server.xml features) surface as approval prompts. Approve them.
 
-3. **Restart the Angular development server:**
-   ```bash
-   # Stop the current server (Ctrl+C)
-   # Then restart
-   cd src/main/frontend
-   npm start
-   ```
+7. **Build validation**
+   - Bob runs `mvn clean compile` and `ng build` to confirm both sides compile cleanly.
+   - Total cost is typically around 5–10 Bob coins for this lab.
 
-### Solution C: Configure CORS (if needed)
+8. **Workflow summary**
+   The final screen shows what was built, files created, and per-task cost/token stats.
 
-If you see CORS-related errors, ensure the backend CORS filter is properly configured:
+---
 
-1. **Verify CORS filter exists:**
-   Check `src/main/java/com/pharmacy/api/CorsFilter.java`
+# Exercise 2: Verify the Migrated Application
 
-2. **Ensure CORS headers allow your frontend origin:**
-   The filter should include:
-   ```java
-   response.setHeader("Access-Control-Allow-Origin", "*");
-   response.setHeader("Access-Control-Allow-Methods", "GET, POST, PUT, DELETE, OPTIONS");
-   response.setHeader("Access-Control-Allow-Headers", "Content-Type, Authorization");
-   ```
+### 1. Start the backend
 
-3. **Restart the backend server** after any CORS configuration changes.
+Open a terminal in the snap folder:
+```bash
+cd Bobathon/labs/lab3-ui-modernization/snapC-ui-mod
+mvn liberty:run
+```
 
-### Solution D: Use Angular Proxy Configuration (Alternative)
+Wait for `The defaultServer server is ready to run a smarter planet`.
 
-If you want to avoid CORS issues during development, configure an Angular proxy:
+### 2. Confirm the backend REST API works
 
-1. **Create a proxy configuration file:**
-   Create `src/main/frontend/proxy.conf.json`:
+In a separate terminal:
+```bash
+curl -i http://localhost:9081/simple-pharmacy.war/api/dashboard
+```
+
+You should get HTTP 200 with a JSON body containing prescriptions and orders.
+
+### 3. Start the Angular dev server
+
+In a second terminal:
+```bash
+cd Bobathon/labs/lab3-ui-modernization/snapC-ui-mod/frontend
+npm start
+```
+
+Wait for `Application bundle generation complete`.
+
+### 4. Open the app in a browser
+
+Open `http://localhost:4200/`.
+
+### 5. Verify
+
+Click through: Dashboard, Prescriptions, Orders, Medicines. All pages should render data.
+
+**If the dashboard is stuck loading and shows no data**, see [Known Issues](#known-issues-and-troubleshooting) — you've likely hit the proxy/context path mismatch.
+
+### 6. Explore the auto-added Swagger UI
+
+Open `http://localhost:9081/openapi/ui/` to see the Swagger UI Bob generated with your API documented.
+
+---
+
+# Known Issues and Troubleshooting
+
+## Known workflow bug: proxy/context path mismatch
+
+**Symptom**: Angular loads, but every page is stuck loading with no data. Browser DevTools Network tab shows `/api/*` requests returning HTTP 404, and the response body is Liberty's "Context Root Not Found" HTML page.
+
+**Cause**: Bob's generated `proxy.config.json` sets `pathRewrite: "^/api" → "/simple-pharmacy/api"`, but Liberty actually deploys the WAR at `/simple-pharmacy.war/`. The two don't match, so every proxied request 404s.
+
+**Fix**:
+1. Open `snapC-ui-mod/frontend/proxy.config.json`.
+2. Change:
    ```json
-   {
-     "/api": {
-       "target": "http://localhost:9081/simple-pharmacy.war",
-       "secure": false,
-       "changeOrigin": true
-     }
+   "pathRewrite": {
+     "^/api": "/simple-pharmacy/api"
    }
    ```
-
-2. **Update the API service to use relative URLs:**
-   In `pharmacy-api.service.ts`:
-   ```typescript
-   private apiUrl = '/api';
+   to:
+   ```json
+   "pathRewrite": {
+     "^/api": "/simple-pharmacy.war/api"
+   }
    ```
+3. Save, stop `npm start` (Ctrl+C), restart with `npm start`.
+4. Hard-refresh the browser (Cmd+Shift+R).
 
-3. **Start Angular with proxy:**
-   ```bash
-   ng serve --proxy-config proxy.conf.json
-   ```
+## Issue: npm global install fails with EACCES
 
-### Verification Steps
+**Symptom**: `npm install -g @angular/cli` reports "The operation was rejected by your operating system."
 
-After applying any solution:
+**Solution**: Run the npm user-prefix setup from the [Prerequisites](#prerequisites) section. Do NOT use sudo.
 
-1. **Check browser console** (F12) for any remaining errors
-2. **Test API endpoints** by navigating through the application
-3. **Verify data loads** on the dashboard, medicines, prescriptions, and orders pages
+## Issue: `SRVE0321E: The [struts2] filter did not load during start up`
 
----
+**Symptom**: Struts filter warning in Liberty logs at startup.
 
-## Getting Help
+**Solution**: Safe to ignore. Doesn't affect runtime behavior.
 
-### During the Lab
-1. **Ask Bob** - Bob can help explain errors and suggest fixes
-2. **Ask Your Instructor** - Don't hesitate to raise your hand
-3. **Collaborate** - Discuss with classmates
+## Issue: OpenAPI validation warnings (CWWKO1650E)
 
-### Bob-Specific Tips
-- Be specific in your requests to Bob
-- Provide error messages in full
-- Ask Bob to explain its reasoning
-- Request step-by-step guidance for complex tasks
-- Use Bob to review code before testing
+**Symptom**: Liberty logs show warnings like "The Path Item Object must contain a valid path" for the OPTIONS operation on paths with `{id}` parameters.
+
+**Solution**: Safe to ignore for lab purposes. The workflow's auto-generated CORS filter OPTIONS handlers don't declare their path parameters in OpenAPI annotations. It doesn't affect API functionality.
+
+## Issue: Bob re-analyzes without applying a requested fix
+
+**Symptom**: You tell Bob about a bug in the chat and ask it to fix, but Bob just re-reads files and reports "build looks clean" without touching anything.
+
+**Solution**: Bob V2's follow-up conversation flow is unreliable for applied fixes. Apply the fix manually, then move on.
 
 ---
 
 # Conclusion
 
-Congratulations! You've completed the Frontend Modernization lab using Bob's Advanced mode. You should now be able to:
+You've completed the UI Modernization lab using Bob V2's Java Modernization workflow. You should now be comfortable with:
 
-Use Bob's Advanced mode for complex migration tasks including  
-   ✅ Analyzing Struts applications and creating migration plans  
-   ✅ Migrating Struts components to Angular standalone components  
-   ✅ Testing and validating migrated applications  
+- ✅ Configuring the UI Modernization workflow (frontend, backend, framework, design system, paths)
+- ✅ Pre-creating the frontend folder before Setup Project
+- ✅ Interpreting Bob's adaptive behavior when a REST layer already exists
+- ✅ Recognizing auto-added features (Swagger UI, Material components)
+- ✅ Diagnosing and fixing the proxy/context path mismatch
 
-## Key Takeaways
-
-1. **Bob's Advanced Mode** provides powerful capabilities for framework migrations
-2. **Structured Approach** - Following a phased migration plan ensures success
-3. **Component Mapping** - Understanding how Struts patterns translate to Angular
-4. **TypeScript Benefits** - Strong typing catches errors early
-5. **Angular Ecosystem** - Material Design and RxJS provide robust solutions
-
-## Next Steps (Optional)
-
-> **Note:** The following activities are optional and can be explored if you have additional time or want to deepen your understanding of the concepts covered in this lab.
-
-Consider exploring the following tasks using Bob:
-
-1. **Performance Optimization**
-   
-   Ask Bob:
-   ```
-   Optimize the Angular application
-   ```
-
-2. **Code Quality Review**
-   
-   Ask Bob:
-   ```
-   Review the migrated code for:
-   - Angular style guide compliance
-   - Proper error handling
-   - Code organization
-   - Documentation completeness
-   ```
-
-3. **Create Migration Summary**
-   
-   Ask Bob:
-   ```
-   Create a MIGRATION_SUMMARY.md document that includes:
-   - What was migrated
-   - Key architectural changes
-   - New features or improvements
-   - Known issues or limitations
-   - Next steps or recommendations
-   ```
+Ready for Lab 4 (Unit Test Generation) next.
 
 ---
-
-**Thank you for completing this lab!** You've successfully used IBM Bob to migrate a Struts application to Angular. This experience demonstrates how Bob can accelerate complex modernization projects while maintaining code quality and best practices.

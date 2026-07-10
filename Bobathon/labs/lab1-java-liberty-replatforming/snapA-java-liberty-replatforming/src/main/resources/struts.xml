@@ -10,7 +10,12 @@
     <constant name="struts.convention.result.path" value="/WEB-INF/content/" />
     
     <package name="pharmacy" extends="struts-default">
-        
+
+        <!-- Default root action - handles empty action name when Struts filter intercepts / -->
+        <action name="" class="com.pharmacy.action.DashboardAction">
+            <result name="success">/WEB-INF/content/dashboard.jsp</result>
+        </action>
+
         <!-- Dashboard Actions -->
         <action name="dashboard" class="com.pharmacy.action.DashboardAction">
             <result name="success">/WEB-INF/content/dashboard.jsp</result>

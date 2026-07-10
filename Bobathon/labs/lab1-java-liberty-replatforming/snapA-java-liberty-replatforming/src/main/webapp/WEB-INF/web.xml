@@ -8,7 +8,7 @@
     <display-name>Simple Pharmacy Dashboard</display-name>
     
     <welcome-file-list>
-        <welcome-file>index.jsp</welcome-file>
+        <welcome-file>dashboard</welcome-file>
     </welcome-file-list>
 
     <!-- Struts 2 Filter -->

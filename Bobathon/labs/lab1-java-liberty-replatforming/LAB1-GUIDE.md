@@ -1,4 +1,4 @@
-# IBM Bob AI Copilot - Java Liberty Replatforming Lab Guide
+# IBM Bob AI Copilot - Java Liberty Replatforming Lab Guide (V2)
 ## Simple Pharmacy Dashboard - WebSphere to Liberty Migration
 
 ---
@@ -6,10 +6,12 @@
 ## Table of Contents
 1. [Introduction](#introduction)
 2. [Prerequisites](#prerequisites)
-3. [Java Modernization Workflow](#java-modernization-workflow)
-4. [Step-by-Step Exercises](#step-by-step-exercises)
-5. [Troubleshooting](#troubleshooting)
-6. [Conclusion](#conclusion)
+3. [V2 Feature Highlights](#v2-feature-highlights)
+4. [Setting Up](#setting-up)
+5. [Exercise 1: Run the Liberty Replatforming Workflow](#exercise-1-run-the-liberty-replatforming-workflow)
+6. [Exercise 2: Verify the Migrated Application](#exercise-2-verify-the-migrated-application)
+7. [Troubleshooting](#troubleshooting)
+8. [Conclusion](#conclusion)
 
 ---
 
@@ -17,7 +19,7 @@
 
 ### What is This Application?
 
-The **Simple Pharmacy Management System** is a web-based application designed to manage pharmacy operations including:
+The **Simple Pharmacy Management System** is a web-based application that manages pharmacy operations including:
 - **Prescriptions**: Create and validate patient prescriptions
 - **Orders**: Process medication orders and payments
 - **Medicines**: Manage medicine inventory
@@ -26,206 +28,172 @@ The **Simple Pharmacy Management System** is a web-based application designed to
 ### What is Java Modernization?
 
 Java Modernization is the process of upgrading legacy Java applications to modern versions and platforms. This typically involves:
-- **Java Version Upgrade**: Moving from older Java versions (like Java 8) to newer LTS versions (like Java 21)
 - **Application Server Migration**: Transitioning from traditional servers (like WebSphere) to lightweight runtimes (like Liberty)
 - **Dependency Updates**: Modernizing libraries and frameworks to current, supported versions
 - **Code Transformation**: Updating code patterns to leverage modern Java features
 
 ## About This Lab
 
-In this lab, you'll use IBM Bob's **Java Modernization mode** to modernize a legacy pharmacy management application. The application currently runs on:
-- **Application Server**: WebSphere Application Server (TWas)
+In this lab, you'll use **Bob V2's Java Modernization workflow** to modernize a legacy pharmacy application. You'll run the **Liberty Replatforming** sub-type of the workflow to migrate the app from Traditional WebSphere to Liberty.
 
-You'll modernize it to:
-- **Application Server**: Liberty Application Server
+- **Before**: Traditional WebSphere (TWas), Java 8, Struts
+- **After**: Liberty Runtime, Java 8, Struts (Java version upgrade is covered separately in Lab 2)
 
 ## Learning Objectives
 
-By completing this lab, you will use Bob to:
-- Walkthrough the Java Modernization workflow which invloves
-   - Analyzing legacy Java applications
-   - Executing automated modernization transformations
-   - Verifying and testing modernized applications
+By the end of this lab, you will:
+- Launch and complete a Bob V2 Java Modernization workflow end-to-end
+- Understand the interactive approval flow Bob uses for each migration change
+- Recognize and interpret Bob's per-task cost and modernization summary output
+- Deploy and verify a modernized Liberty application
 
 ---
 
 # Prerequisites
 
-## Required Software
+### 1. IBM Bob IDE (V2)
+- Ensure the latest Bob V2 IDE extension is installed
+- You need a Bob subscription tier that includes the Java Modernization workflow suite (the Premium package)
 
-Before starting this lab, ensure you have the following installed:
+### 2. Terminal Environment (macOS)
+The Liberty Replatforming workflow can install its own tools, but a working shell setup helps. On macOS the default shell is **zsh**.
 
-### 1. IBM Bob IDE
-- Ensure you have IBM Bob latest version installed
-- Login through Bob to get connected
-
-### 2. SDKMAN! (SDK Manager)
-SDKMAN! is a tool for managing parallel versions of multiple Software Development Kits on Unix-based systems.
-
-**Installation Instructions:**
+If SDKMAN is not installed:
 ```bash
 curl -s "https://get.sdkman.io" | bash
-source "$HOME/.sdkman/bin/sdkman-init.sh"
+echo '[[ -s "$HOME/.sdkman/bin/sdkman-init.sh" ]] && source "$HOME/.sdkman/bin/sdkman-init.sh"' >> ~/.zshrc
+source ~/.zshrc
 ```
 
-**Verify Installation:**
+Verify: `sdk version`
+
+### 3. Java 8 (optional — the workflow can install it for you)
+If you want a pre-set environment, install a Java 8 build. Note that stale identifiers like `8.0.432-tem` no longer exist on SDKMAN, and Temurin 8 isn't available on Apple Silicon.
+
+To pick a working build:
 ```bash
-sdk version
+sdk list java | grep " 8\."
 ```
-
-You should see output like: `SDKMAN! 5.x.x`
-
-**For detailed instructions, visit:** https://sdkman.io/install/
-
-### 3. Java Development Kit (JDK)
-Java 8 or higher is required for this application. If you don't have Java installed, follow these steps:
-
-**Check if Java is Already Installed:**
+Confirmed working on Apple Silicon: `8.0.492-zulu`.
 ```bash
+sdk install java 8.0.492-zulu
+sdk default java 8.0.492-zulu
 java -version
 ```
 
-If Java is not installed or you need a different version, install it using SDKMAN!:
-
-**Installation Instructions (via SDKMAN!):**
-```bash
-# Install Java 8 (required for this lab)
-sdk install java 8.0.432-tem
-
-# Set it as the default version
-sdk default java 8.0.432-tem
-```
-
-**Verify Java Installation:**
-```bash
-java -version
-```
-
-You should see output showing Java version 8 (e.g., `openjdk version "1.8.0_432"`).
-
-**Alternative Installation Methods:**
-- **macOS**: Download from [Adoptium](https://adoptium.net/) or use Homebrew: `brew install openjdk@8`
-- **Windows**: Download from [Adoptium](https://adoptium.net/) and follow the installer
-- **Linux**: Use your package manager (e.g., `apt install openjdk-8-jdk` on Ubuntu)
-
-### 4. Maven (via SDKMAN!)
-After installing SDKMAN! and Java, install Maven:
-
+### 4. Maven (via SDKMAN)
 ```bash
 sdk install maven
-```
-
-**Verify Maven Installation:**
-```bash
 mvn --version
 ```
 
-You should see Maven version information along with the Java version that Maven is using.
-
-**Important Note on Java Versions:**
-When you run `mvn --version`, it shows the Java version that Maven will use to build your project. This may differ from your system's default Java version (shown by `java -version`). Maven uses the Java version specified by the `JAVA_HOME` environment variable or the Java installation that SDKMAN! has configured.
-
-## Important: Restart Bob After Maven Installation
-
-**⚠️ CRITICAL STEP:** After installing Maven via SDKMAN!, you **MUST** close and restart IBM Bob (or your IDE) for the changes to take effect. This ensures Bob can detect and use the newly installed Maven.
-
-**To restart Bob:**
-1. Close your IDE completely
-2. Reopen your IDE
-3. Verify Maven is detected by running the command to verify its installation in Bob's terminal
+### 5. Restart Bob
+After installing Maven, fully quit and restart Bob so it picks up the new tools.
 
 ---
 
-# Java Modernization Workflow
+# V2 Feature Highlights
 
-## Overview of Bob's Java Modernization Mode
+Bob V2's Java Modernization workflow introduces several capabilities worth watching for during this lab:
 
-IBM Bob's Java Modernization mode follows a structured workflow:
-
-* **Analyze**
-   * Bob analyzes your Java project and allows you to select a modernization type (Liberty Replatforming or Java Upgrade)
-* **Upgrade**
-   * Bob performs agentic upgrade of your Java prohject accoridng to the selected modernization type
-* **Validate**
-   * Bob validates your project's migration
-
-## Auto-Approval Settings
-You can control what Bob does automatically:
-- **Read**: Let Bob read files without asking
-- **Write**: Let Bob modify files without asking
-- **Execute**: Let Bob run commands without asking
-- **Todo**: Let Bob create task lists without asking
-
-**Tip for Users:** Start with only "Read" enabled until you're comfortable!
+- **Interactive approval flow**: Bob proposes each migration change and asks for explicit approval before applying it. You can accept, revise, or ask for a preview of the exact edit.
+- **Iterative issue-by-issue upgrade**: Rather than running all recipes at once, the workflow addresses each migration issue individually with rationale for the fix.
+- **Layered mitigations**: When appropriate, Bob suggests both a library-level fix and a runtime-level fix (e.g. upgrading OGNL AND adding a JVM option) for defense in depth.
+- **Per-task cost/token breakdown**: The workflow summary at the end shows exact cost in Bob coins and token counts per subtask.
+- **Visual modernization summary**: An auto-generated graphic at the end shows every step performed, categorized by outcome.
+- **Autonomous tool install**: If Java isn't set up, the workflow will install the required version via SDKMAN itself.
 
 ---
 
-# Step-by-Step Exercises
+# Setting Up
 
-## Exercise 1: Open the Project & Activate Java Modernization Mode
+### 1. Open the snapshot subfolder as your project root
 
+In Bob, open **this exact folder** as the project root:
+```
+Bobathon/labs/lab1-java-liberty-replatforming/snapA-java-liberty-replatforming
+```
 
-1. Launch your IDE with IBM Bob installed
+**Important**: The Java Modernization workflow only appears when Bob is opened at the `snapA-*` subfolder, NOT the parent `lab1-*` folder.
 
-2. Open the ```1_Java_Liberty_Replatforming``` project folder
+### 2. Confirm Agent mode
 
-3. If the Bob Chat window is not already open, select the Bob icon at the to the left of the search bar at the tope of your IDE.
+In Bob's chat panel, verify the mode indicator at the bottom shows **Agent**. (Agent is V2's default mode and replaces V1's `Advanced` and `Code` modes.)
 
-4. At the bottom of the chat, you'll see the current mode (e.g., "💻 Code" or "❓ Ask"). Click on the current mode name at the bottom of the chat.
+### 3. Confirm the workflow appears
 
-5. Select "☕ Java Modernization" from the dropdown menu. You should now be in Java Modernization mode, ready to begin the modernization process. Java modernization Workflows should also be an option if you want to click into that workflow.
+Look for the **Java Modernization** workflow in Bob's chat panel workflow list. If it's not visible, verify your team membership in Bob's settings.
 
 ---
 
-## Exercise 2: Initiate the Java Modernization workflow
+# Exercise 1: Run the Liberty Replatforming Workflow
 
 ### Objective
-Have Bob use the Java Modernization worklfow to analyze your current application, use a migration plan to upgrade the application, and validate the application post-upgrade.
+Use Bob's Java Modernization workflow to migrate the pharmacy app from Traditional WebSphere to Liberty.
 
 ### Steps
 
-1. **Start the Workflow**
-   
-   * In the Bob chat window, you will see the **Java Modernization** workflow under **Workflows**. Selcet the **Start** button on the workflow to have Bob begin the Java modernization flow.
+1. **Start the workflow**
+   - In Bob's chat panel, click **Start** on the Java Modernization workflow.
 
-2. **Analyze**
+2. **Analyze Project screen**
+   - The project path should auto-populate to the snapA folder.
+   - Leave "Custom build command" blank.
+   - Click **Continue**.
 
-   * **1.1 Analyze Java Project**
-      
-      Copy and Paste into the Project Path where your folder is located:
-      ```
-      bobathon/Bobathon/labs/lab1-java-liberty-replatforming/snapA-java-liberty-replatforming
-      ```
+3. **Modernization Type screen**
+   - Select **Liberty Replatforming**.
+   - Leave **Enable Git Flow** unchecked (Git branch management should be done outside the workflow for this lab).
+   - Click **Continue**.
 
-   * **1.2 Select Java modernization type**
-   
-      Select **Liberty Replatforming** for modernization type. Toggle **Git Flow** off.
+4. **Provide the AMA migration plan**
+   - Paste the full path to the migration plan ZIP file:
+     ```
+     [your local path]/Bobathon/labs/lab1-java-liberty-replatforming/simple-pharmacy.war_migrationPlan.zip
+     ```
+   - Click **Continue**.
 
-3. **Upgrade**
+5. **Interactive approval flow**
+   - Bob will identify migration issues one at a time. For each, it will:
+     - Explain the root cause of the issue
+     - Propose a specific fix (usually a dependency change or config addition)
+     - Ask for your approval
+   - You'll typically see three options for each issue:
+     - `Approve the fix and proceed with implementation`
+     - `Do not change dependencies yet; inspect further`
+     - `Approve the fix, but show me the exact edits before applying them`
+   - **Recommendation**: for the first issue or two, pick the "show me the exact edits" option to see what Bob is proposing. For subsequent issues, approving directly is fine.
+   - Expected issues on this project (may vary):
+     - Javassist charset warning (dependency exclusion + upgrade)
+     - OGNL SecurityManager conflict (dependency upgrade + JVM options file)
+     - Liberty class-loading / CDI conflict (server.xml adjustments)
 
-   a. **Liberty Replatforming**
-   
-   * **2.0 Run Liberty Modernization Analysis**
+6. **Deployment**
+   - After the fixes are applied, the workflow will build the app and deploy to Liberty.
+   - Bob will report when the server is running and give you the URLs.
 
-      Provide the path to the Application modernization Accelerator Deployment Plan ZIP file (**simple-pharmacy.war_migrationPlan.zip**) and select **Analyze Liberty Migration**. Bob will analyze the plan and create a Todo List for modernization.
+7. **Modernization summary**
+   - Bob generates a visual modernization summary and prints per-task cost/token stats.
+   - Confirm the workflow reports "started successfully with no errors" or select the appropriate option based on your logs.
 
-   * **2.1 Run Liberty Re-Platforming recipes**
+---
 
-      Click **Run Recipes** to upgrade your Java code for Liberty
+# Exercise 2: Verify the Migrated Application
 
+Open a browser and go to:
+```
+http://localhost:9080/simple-pharmacy.war/
+```
 
-   * **2.2 Perform agentic upgrade**
+You should see the pharmacy dashboard with data (prescriptions, orders, medicines).
 
-      Bob will proceed with the upgrade task involving several subtasks. Bob will create a to do list(s) and complete tasks agentically, while also allowing user intervention and approvals.
+Try navigating to:
+- `http://localhost:9080/simple-pharmacy.war/dashboard`
+- `http://localhost:9080/simple-pharmacy.war/prescription-list.action`
+- `http://localhost:9080/simple-pharmacy.war/order-list.action`
+- `http://localhost:9080/simple-pharmacy.war/medicine-list.action`
 
-
-3. **Validate**
-
-   Select the option for Bob to Validate and/or Deploy your application
-
-4. **Optional: Run the application**
-   Prompt Bob to run the Simple Pharmacy application. Follow the URL the Bob provides to view the UI of the local application.
-
+If all pages render, the migration is complete.
 
 ---
 
@@ -233,64 +201,47 @@ Have Bob use the Java Modernization worklfow to analyze your current application
 
 ## Issue 1: Maven Not Found After Installation
 
-**Symptom:**
-```
-mvn: command not found
-```
+**Symptom:** `mvn: command not found`
 
 **Solution:**
-1. Verify SDKMAN! installation: `sdk version`
+1. Verify SDKMAN installation: `sdk version`
 2. Reinstall Maven: `sdk install maven`
-3. **Restart your IDE/Bob completely**
-4. Open new terminal and verify: `mvn --version`
+3. Fully restart Bob (not just close the window)
+4. Open a new terminal and verify: `mvn --version`
 
+## Issue 2: Bob Terminal Uses Wrong Java Version
 
-## Issue 2: Bob Can't Read Project Files
+**Symptom:** `java -version` in Bob's terminal shows a different version than expected.
 
-**Symptom:**
-Bob says "I cannot access that file" or "File not found"
+**Solution:** `sdk use java <identifier>` only applies to the shell it's run in. Bob's terminal is a separate shell. Run `sdk use java 8.0.492-zulu` in Bob's terminal specifically, or set the default with `sdk default java 8.0.492-zulu`.
 
-**Solution:**
-1. Verify you're in the correct directory
-2. Check file permissions: `ls -la`
-3. Ensure Bob has read access to the workspace
-4. Try referencing files with `@filename` syntax
+## Issue 3: `SRVE0321E: The [struts2] filter did not load during start up`
 
-## Issue 3: Error: Unable to access jarfile when providing AMA zip file path in Liberty Modernization
+**Symptom:** After Liberty deploys, the log shows a Struts2 filter loading error.
 
-**Symptom:**
-```
-Error: Unable to access jarfile /Applications/IBM Bob.app/Contents/Resources/app/extensions/bob-code/assets/jars/ta-jam-2.2.1.jar
-```
+**Solution:** Safe to ignore. The migrated app functions correctly; the message reflects a class-loading side effect that doesn't affect runtime behavior.
 
-**Solution:**
-1. Create a ```jars``` folder in your Bob application folder, in your Applications folder(```/Applications/IBM Bob.app/Contents/Resources/app/extensions/bob-code/assets```)
-2. Add the ```ta-jam-2.2.1.jar``` and ```prompt-lib-2.2.0.jar``` files using the following file structure
-   ```
-   ├── jars/
-   │   └── prompt-lib/
-   │       ├── prompt-lib-2.2.0.jar/
-   │   └── ta-jam-2.2.1.jar
-   ```
-3. Close and restart Bob
+## Issue 4: `CWWKS9660E: The orb element with the defaultOrb id attribute requires a user registry`
 
-   **Caution:** Make sure Bob is not running from /Volumes (mounted .dmg). Move the IBM BoB app to the /Applications folder and run it from there; otherwise it will not be allowed to create folders or place .jar files.
----
-## Getting Help
+**Symptom:** ORB-related warning appears in Liberty logs.
 
-### During the Lab
-1. **Check Troubleshooting Section** - Most common issues are covered
-2. **Ask Bob** - Bob can help explain errors and suggest fixes
-3. **Ask Your Instructor** - Don't hesitate to raise your hand
-4. **Collaborate** - Discuss with classmates 
+**Solution:** Safe to ignore per the message itself, provided the app doesn't use ORB-based EJB components (this one doesn't).
+
+## Issue 5: Workflow proposes a change but you're not sure
+
+**Solution:** Any time Bob offers "show me the exact edits before applying them," pick that option. Bob will render the diff for your review before touching any files.
 
 ---
 
 # Conclusion
 
-Congratulations! You've completed the Java Modernization lab. You should now be able to:
+Congratulations — you've completed the Liberty Replatforming lab using Bob V2's Java Modernization workflow. You should now be comfortable with:
 
-✅ Set up prerequisites (SDKMAN!, Maven)  
-✅ Use Bob's Java Modernization mode to analyze and upgrade the Pharmacy application and validate its modeernization
+- ✅ Launching a Bob V2 Java Modernization workflow
+- ✅ Navigating the interactive approval flow for each migration change
+- ✅ Reading Bob's per-task cost and modernization summary output
+- ✅ Deploying and verifying a modernized Liberty application
+
+Ready for Lab 2 (Java Upgrade) next.
 
 ---

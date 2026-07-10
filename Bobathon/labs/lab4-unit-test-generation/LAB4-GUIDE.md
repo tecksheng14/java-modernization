@@ -1,15 +1,16 @@
-# IBM Bob AI Copilot - Unit Test Generation Lab Guide
-## Simple Pharmacy Dashboard - Comprehensive Test Coverage
+# IBM Bob - Unit Test Generation Lab Guide (V2)
 
 ---
 
 ## Table of Contents
 1. [Introduction](#introduction)
 2. [Prerequisites](#prerequisites)
-3. [Unit Test Generation with Bob's Advanced Mode](#unit-test-generation-with-bobs-advanced-mode)
-4. [Step-by-Step Exercises](#step-by-step-exercises)
-5. [Troubleshooting](#troubleshooting)
-6. [Conclusion](#conclusion)
+3. [V2 Feature Highlights](#v2-feature-highlights)
+4. [Setting Up](#setting-up)
+5. [Exercise 1: Run the Java Unit Testing Workflow](#exercise-1-run-the-java-unit-testing-workflow)
+6. [Exercise 2: Review the Test Strategy and Results](#exercise-2-review-the-test-strategy-and-results)
+7. [Troubleshooting](#troubleshooting)
+8. [Conclusion](#conclusion)
 
 ---
 
@@ -17,543 +18,242 @@
 
 ### What is Unit Test Generation?
 
-Unit Test Generation is the process of creating automated tests that verify individual components of an application work correctly in isolation. This typically involves:
-- **Test Case Design**: Identifying what to test and how to test it
-- **Mock Creation**: Isolating units from their dependencies
-- **Assertion Writing**: Verifying expected behavior
-- **Edge Case Coverage**: Testing boundary conditions and error scenarios
-- **Test Organization**: Structuring tests for maintainability
+Unit test generation uses Bob V2's dedicated **Java Unit Testing** workflow to automatically:
+- Analyze your project and identify testable classes
+- Draft a written test strategy explaining what will be tested and how
+- Install and configure JaCoCo for code coverage
+- Generate JUnit 5 tests with Mockito mocks and AssertJ assertions
+- Run the generated tests and report the coverage baseline
 
 ## About This Lab
 
-In this lab, you'll use IBM Bob's **Advanced mode** to generate comprehensive unit tests for a pharmacy management application. The application currently has **no tests**, and you'll create a complete test suite covering:
+You'll use the standalone **Java Unit Testing** workflow to add a comprehensive test suite to the pharmacy app.
 
-### Components to Test:
-1. **REST API Resources** (PrescriptionResource, OrderResource, MedicineResource, DashboardResource)
-   - HTTP endpoint behavior
-   - Request/response handling
-   - Error scenarios
-   - Status code validation
-
-2. **Repository Classes** (PrescriptionRepository, OrderRepository, MedicineRepository)
-   - CRUD operations
-   - Search and filter functionality
-   - Data integrity
-   - Concurrent access scenarios
-
-3. **Model Classes** (Prescription, Order, Medicine)
-   - Constructor validation
-   - Getter/setter behavior
-   - Business logic methods
-
-### Testing Technologies:
-- **JUnit 5**: Modern testing framework
-- **Mockito**: Mocking framework for dependencies
-- **AssertJ**: Fluent assertions for better readability
-- **Maven Surefire**: Test execution and reporting
+- **Before**: Liberty Runtime, Java 21, Angular frontend, no tests
+- **After**: Same, with JUnit 5 test suite, JaCoCo coverage, and a `UNITTEST.md` strategy file
 
 ## Learning Objectives
 
-By completing this lab, you will learn how to use Bob's Advanced mode to:
-- Generate comprehensive unit tests for Java applications
-- Create effective mocks and test doubles
-- Write tests for REST API endpoints
-- Test repository and data access layers
-- Achieve high code coverage
-- Implement testing best practices
-- Structure and organize test suites
+By the end of this lab, you will:
+- Launch the standalone Java Unit Testing workflow
+- Understand each option on the task-selection screen
+- Read Bob's `UNITTEST.md` test strategy file
+- Interpret the cost/time preview and 80% confidence interval
+- Review the coverage baseline Bob reports at the end
 
 ---
 
 # Prerequisites
 
-## Required Software
+### 1. IBM Bob IDE (V2)
+Latest Bob V2 IDE extension installed with the Java premium package on your plan.
 
-Before starting this lab, ensure you have the following installed:
+### 2. Terminal Environment (macOS zsh)
+Check that SDKMAN is set up:
+```
+sdk version
+```
 
-### 1. IBM Bob IDE
-- Ensure you have IBM Bob latest version installed
-- Login through Bob to get connected
-- Ensure you have access to **Advanced mode** (required for this lab)
-
-### 2. Java Development Kit (JDK)
-Java 21 is required for this application.
-
-**Installation Instructions:**
-- Download from: https://adoptium.net/ (Eclipse Temurin 21 LTS recommended)
-- Or use SDKMAN:
-  ```bash
-  # Install SDKMAN (macOS/Linux)
-  curl -s "https://get.sdkman.io" | bash
-  
-  # Install Java 21
-  sdk install java 21-tem
-  sdk use java 21-tem
-  ```
-
-**Verify Java Installation:**
+If SDKMAN isn't set up:
 ```bash
-java -version
+curl -s "https://get.sdkman.io" | bash
+echo '[[ -s "$HOME/.sdkman/bin/sdkman-init.sh" ]] && source "$HOME/.sdkman/bin/sdkman-init.sh"' >> ~/.zshrc
+source ~/.zshrc
 ```
 
-You should see Java version 21.
-
-### 3. Apache Maven
-Maven is required to build and run tests.
-
-**Installation Instructions:**
-- Download from: https://maven.apache.org/download.cgi
-- Or use SDKMAN:
-  ```bash
-  sdk install maven
-  ```
-
-**Verify Maven Installation:**
+### 3. Java 21
 ```bash
-mvn -version
+sdk list java | grep " 21\."
+```
+Confirmed working on Apple Silicon: `21.0.11-zulu`.
+```bash
+sdk install java 21.0.11-zulu
+sdk use java 21.0.11-zulu
+java -version   # should show 21
 ```
 
-You should see Maven version information along with the Java version that Maven is using.
+### 4. Maven
+Check if maven is installed already:
+```
+mvn -v
+```
 
-**Important Note on Java Versions:**
-When you run `mvn -version`, it shows the Java version that Maven will use to build your project. This may differ from your system's default Java version (shown by `java -version`). Maven uses the Java version specified by the `JAVA_HOME` environment variable or the Java installation that SDKMAN! has configured.
+If not, install it:
+```bash
+sdk install maven
+```
 
-## Important: Understanding Bob's Advanced Mode
-
-This lab requires Bob's **Advanced mode**, which provides:
-- **Test Generation**: Intelligent creation of comprehensive test suites
-- **Multi-file Operations**: Simultaneous reading and test creation for multiple classes
-- **Testing Patterns**: Knowledge of JUnit 5, Mockito, and testing best practices
-- **Coverage Analysis**: Understanding what needs to be tested
-
-**To access Advanced mode:**
-1. Open Bob's chat interface
-2. Click on the current mode indicator at the bottom
-3. Select "🚀 Advanced" from the mode dropdown
-4. Confirm you want to switch to Advanced mode
+### 5. Restart Bob
+Fully quit and restart Bob after installing Maven.
 
 ---
 
-# Unit Test Generation with Bob's Advanced Mode
+# Workflow Steps Highlights
 
-## Overview of Bob's Advanced Mode for Test Generation
+1. **Project Analysis** — Scans the project structure, build tool, and existing test infrastructure (JUnit version, JaCoCo, Surefire plugin) to understand the starting state.
 
-IBM Bob's Advanced mode provides powerful capabilities for creating comprehensive test suites:
+2. **Test Strategy Generation** — Produces a UNITTEST.md strategy document defining conventions: naming patterns, mocking approach, isolation rules, and scope.
 
-### Key Features for Testing:
-1. **Intelligent Test Design**: Bob analyzes the codebase to understand what needs testing, identifies critical paths and edge cases, determines appropriate test strategies, and creates comprehensive test plans.
+3. **Task-selection screen**: choose whether to regenerate the strategy, generate tests, run coverage, and enable Git Flow. Includes a **Candidate Selection Strategy** dropdown (default: All classes).
 
-2. **Automated Test Creation**: Bob generates JUnit 5 test classes with proper structure, creates Mockito mocks for dependencies, writes meaningful test methods with clear names, and implements proper setup and teardown methods.
+4. **Cost/time preview**: before expensive operations, Bob shows expected duration and Bob-coin cost with an **80% confidence interval** — a rare bit of self-acknowledged variance in AI tooling.
 
-3. **Best Practices Implementation**: Bob follows testing conventions and patterns, uses appropriate assertion libraries (AssertJ), implements proper test isolation, and creates maintainable and readable tests.
+5. **Test Generation** (Batched Subagents) — Spawns parallel subagents per package/batch, each reading the production class and UNITTEST.md to write focused JUnit 5 tests with Mockito mocks where needed.
 
-4. **Coverage Optimization**: Bob ensures all public methods are tested, covers edge cases and error scenarios, tests both success and failure paths, and validates boundary conditions.
+6. **Build & Dependency Updates** — Adds missing test dependencies (junit-jupiter, mockito-core, mockito-junit-jupiter, JAX-RS runtime for container-free tests) to pom.xml as needed.
 
----
+7. **Self-correcting recovery tasks**: if the workflow hits build issues mid-run (stale class files, compile race conditions, etc.), it adds unplanned recovery subtasks and fixes them without user prompting.
 
-# Step-by-Step Exercises
+8. **Test Execution & Validation** — Runs mvn test and fixes any failures before proceeding, ensuring a green suite throughout.
 
-## Exercise 1: Project Setup and Test Infrastructure
-
-1. **Open Bob Chat Interface**
-   - If the Bob Chat window is not already open, click the Bob icon in your IDE's sidebar
-
-2. **Switch to Bob's Advanced Mode**
-   - Click on the current mode name at the bottom of the chat
-   - Select "🚀 Advanced" from the mode dropdown
-   - Confirm the mode switch if prompted
-
-3. **Set Up Testing Dependencies**
-   
-   In Bob's chat, type:
-   ```
-   I need to add unit testing capabilities to this Java project. Please:
-   1. Update pom.xml to include JUnit 5, Mockito, and AssertJ dependencies
-   2. Configure the Maven Surefire plugin for test execution
-   3. Create the test directory structure (src/test/java)
-   
-   Use the latest stable versions of testing frameworks.
-   ```
-
-4. **Verify Setup**
-   - Review Bob's changes to pom.xml
-   - Ensure test directory structure is created
-   - Run `mvn clean test` to verify the setup (tests will pass as none exist yet)
-
-## Exercise 2: Generate Repository Tests
-
-1. **Test All Repository Classes**
-   
-   Ask Bob:
-   ```
-   Generate comprehensive unit tests for all three repository classes: PrescriptionRepository.java, MedicineRepository.java, and OrderRepository.java.
-   
-   For PrescriptionRepository, include tests for:
-   - getInstance() singleton pattern
-   - generateId() ID generation
-   - addPrescription() and findById()
-   - findAll() returning all prescriptions
-   - findByPatientId() filtering
-   - findByStatus() filtering
-   - updatePrescription() modification
-   - deletePrescription() removal
-   - Edge cases (null values, empty results, etc.)
-   
-   For MedicineRepository, include tests for:
-   - Singleton pattern
-   - CRUD operations (add, find, update, delete)
-   - searchByName() with various inputs
-   - updateStock() including edge cases (insufficient stock, negative quantities)
-   - Sample data initialization
-   
-   For OrderRepository, include tests for:
-   - All CRUD operations
-   - findByPatientId(), findByStatus(), findByPrescriptionId()
-   - ID generation
-   - Edge cases and boundary conditions
-   
-   Use JUnit 5 and follow best practices. Create the test files in src/test/java/com/pharmacy/repository/
-   ```
-
-2. **Run Repository Tests**  (if not run automatically by Bob)
-   ```bash
-   mvn test
-   ```
-
-## Exercise 3: Generate REST API Resource Tests
-
-1. **Test All REST API Resource Classes**
-   
-   Ask Bob:
-   ```
-   Generate comprehensive unit tests for all four REST API resource classes: PrescriptionResource.java, OrderResource.java, MedicineResource.java, and DashboardResource.java.
-   
-   For PrescriptionResource, include tests for:
-   - getAllPrescriptions() - retrieval successful
-   - getPrescriptionById() - found and not found scenarios
-   - createPrescription() - success, invalid medicine ID, missing data, validation errors
-   - validatePrescription() - success, not found, invalid status transitions
-   
-   For OrderResource, include tests for:
-   - getAllOrders() and getOrderById()
-   - createOrderFromPrescription() - success, prescription not found, not validated, insufficient stock
-   - processPayment() - success, order not found, invalid status, payment method validation
-   - collectOrder() - success, order not found, not paid
-   
-   For MedicineResource, include tests for:
-   - getAllMedicines()
-   - getMedicineById() - found and not found
-   - searchMedicines() - with name, empty name, no results
-   
-   For DashboardResource, include tests for:
-   - getDashboardData() returns correct structure
-   - Proper aggregation of pending prescriptions and orders
-   - Total counts are accurate
-   
-   Use Mockito to mock all repository dependencies (PrescriptionRepository, MedicineRepository, OrderRepository).
-   Test HTTP response codes and response bodies.
-   Use JUnit 5 and AssertJ for assertions.
-   Create the test files in src/test/java/com/pharmacy/api/
-   ```
-
-2. **Run API Tests** (if not run automatically by Bob)
-   ```bash
-   mvn test
-   ```
-
-## Exercise 4: Generate Model Tests
-
-1. **Test Model Classes**
-   
-   Ask Bob:
-   ```
-   Generate unit tests for the model classes (Prescription, Order, Medicine). Include:
-   - Constructor tests with valid data
-   - Getter and setter tests
-   - Edge cases (null values, boundary conditions)
-   - Any business logic methods
-   - toString(), equals(), and hashCode() if implemented
-   
-   These should be simple tests focusing on data integrity.
-   ```
-
-2. **Run Model Tests** (if not run automatically by Bob)
-   ```bash
-   mvn test
-   ```
-
-## Exercise 5: Test Coverage Analysis and Improvement
-
-1. **Add Code Coverage Plugin**
-   
-   Ask Bob:
-   ```
-   Add JaCoCo (Java Code Coverage) plugin to pom.xml to measure test coverage.
-   Configure it to generate coverage reports.
-   ```
-
-2. **Run Coverage Report** (if not run automatically by Bob)
-   ```bash
-   mvn clean test jacoco:report
-   ```
-
-3. **Analyze Coverage**
-   
-   Ask Bob:
-   ```
-   Review the JaCoCo coverage report at target/site/jacoco/index.html.
-   Identify any gaps in test coverage and suggest additional tests to improve coverage.
-   ```
-
-4. **Generate Missing Tests**
-   - Based on Bob's analysis, ask for additional tests to cover gaps
-   - Focus on achieving >80% code coverage
-
-## Exercise 6: Integration and Edge Case Testing
-
-1. **Add Integration-Style Tests**
-   
-   Ask Bob:
-   ```
-   Create integration-style tests that test multiple components together:
-   - Test the full flow: create prescription → validate → create order → process payment → collect
-   - Test error propagation between layers
-   - Test concurrent access scenarios for repositories
-   
-   These tests should use real repository instances (not mocks) but still be unit tests.
-   ```
-
-2. **Add Edge Case Tests**
-   
-   Ask Bob:
-   ```
-   Create additional edge case tests for:
-   - Concurrent modifications to the same prescription/order
-   - Very large quantities or amounts
-   - Special characters in patient names or medicine names
-   - Date boundary conditions (expired prescriptions, future dates)
-   - Empty or null collections
-   ```
-
-## Exercise 7: Test Organization and Documentation
-
-1. **Organize Test Suite**
-   
-   Ask Bob:
-   ```
-   Review the test suite and suggest improvements for:
-   - Test class organization and naming
-   - Test method naming conventions
-   - Common setup code that could be extracted
-   - Test data builders or fixtures
-   - Documentation and comments
-   ```
-
-2. **Create Test Documentation**
-   
-   Ask Bob:
-   ```
-   Create a TESTING.md document that includes:
-   - Overview of the test suite structure
-   - How to run tests (all tests, specific tests, with coverage)
-   - Testing conventions and patterns used
-   - How to add new tests
-   - Coverage goals and current status
-   ```
-
-3. **Run Full Test Suite**
-   ```bash
-   mvn clean test
-   ```
-
-### Expected Outcome
-- Complete test suite with 50+ test methods
-- >80% code coverage across all layers
-- All tests passing
-- Well-organized and maintainable test code
-- Comprehensive documentation
-- Fast test execution (<30 seconds)
+9. **Coverage Reporting** — Runs the full suite with JaCoCo enabled and surfaces per-class instruction coverage, highlighting any remaining gaps.
 
 ---
 
-# Troubleshooting
+# Setting Up
 
-## Issue 1: API Request Failed
-
-**Symptom:**
+### 1. Open the snapshot subfolder as your project root
 ```
-{"apiProtocol":"openai"}
+Bobathon/labs/lab4-unit-test-generation/snapD-unit-test-gen
 ```
+Use the `snapD-*` subfolder, not the parent `lab4-*` folder.
 
-**Solution:**
-Select "Retry" in the Bob chat window
+### 2. Confirm Agent mode
+Bob's chat panel should show **Agent** at the bottom.
 
-## Issue 2: Test Compilation Errors
-
-**Symptom:**
-Tests fail to compile with missing imports or dependencies
-
-**Solution:**
-1. Verify all testing dependencies are in pom.xml
-2. Run `mvn clean install` to download dependencies
-3. Ask Bob to review and fix import statements
-4. Ensure Java version is 21
-
-## Issue 3: Mock Injection Failures
-
-**Symptom:**
-```
-NullPointerException in tests when accessing mocked objects
-```
-
-**Solution:**
-1. Ensure `@ExtendWith(MockitoExtension.class)` is on test class
-2. Verify `@Mock` and `@InjectMocks` annotations are correct
-3. Check that mocks are initialized in `@BeforeEach` if needed
-4. Ask Bob to review mock setup
-
-## Issue 4: Tests Fail Due to Singleton State
-
-**Symptom:**
-Tests pass individually but fail when run together
-
-**Solution:**
-1. Repository singletons maintain state between tests
-2. Add reset methods to repositories or use reflection to reset instances
-3. Ask Bob to implement proper test isolation
-4. Consider using `@TestInstance(Lifecycle.PER_CLASS)` with proper cleanup
-
-## Issue 5: Coverage Report Not Generated
-
-**Symptom:**
-JaCoCo report directory doesn't exist
-
-**Solution:**
-1. Ensure JaCoCo plugin is properly configured in pom.xml
-2. Run `mvn clean test jacoco:report` (not just `mvn test`)
-3. Check for errors in Maven output
-4. Verify target/site/jacoco directory is created
+### 3. Confirm the workflow appears
+Look for **Java Unit Testing** in Bob's chat panel workflow list (it's a top-level workflow)
 
 ---
 
-## Getting Help
+# Exercise 1: Run the Java Unit Testing Workflow
 
-### During the Lab
-1. **Ask Bob** - Bob can help explain testing concepts and fix test issues
-2. **Ask Your Instructor** - Don't hesitate to raise your hand
-3. **Collaborate** - Discuss testing approaches with classmates
+### Steps
 
-### Bob-Specific Tips
-- Be specific about what you want to test
-- Provide context about the class being tested
-- Ask Bob to explain testing patterns if unclear
-- Request examples of similar tests
-- Use Bob to review and improve existing tests
+1. **Start the workflow**
+   - Click **Start** on the **Java Unit Testing** workflow in Bob's chat panel.
+
+2. **Automatic setup**
+   Bob will:
+   - Detect that no code coverage tool is configured
+   - Install JaCoCo into pom.xml
+   - Read through the codebase to develop a testing strategy
+   - Draft the test strategy, UNITTEST.md
+
+   No approval prompts appear during this phase — this is expected.
+
+3. **Task selection screen**
+   Choose:
+   - Leave **Re-generate Unit Test Strategy** unchecked (Bob just drafted one)
+   - Check **Generate Unit Tests**
+   - **Candidate Selection Strategy**: `All classes` (the default)
+   - Check **Run Code Coverage**
+   - Leave **Enable Git Flow** unchecked
+
+   Click **Continue**.
+
+4. **Cost/time preview**
+   Bob shows something like:
+   > "I will generate unit tests for 12 classes in 4 batches. For each batch, I expect a duration of 3 minutes and cost of 2.8 Bob coins (80% of batches finish within these limits)."
+
+   Note the 80% confidence phrasing. Click **Proceed with test generation**.
+
+5. **Batch generation**
+   Bob generates tests in batches organized by package leveraging subagents with isolated contexts:
+   - `com.pharmacy.repository` (3 classes)
+   - `com.pharmacy.api` — first batch (1 class)
+   - `com.pharmacy.model` (3 classes)
+   - `com.pharmacy.api` — remaining classes (5 classes)
+
+   If Bob hits build issues mid-run (stale `.class` files, incremental compile race), it will add recovery subtasks and fix them autonomously.
+
+6. **Test execution and coverage report**
+   After all batches complete, Bob runs `mvn test` and reports pass/fail counts, then generates a JaCoCo coverage report. If a report is not automatically generated or surfaced, just ask Bob `please generate a JaCoCo coverage report`
+
+7. **Workflow summary**
+   Bob prints a per-task cost breakdown and a modernization summary graphic. Typical actual cost lands well under the preview (e.g. ~4.5 coins vs an ~11 coin preview).
+
+---
+
+# Exercise 2: Review the Test Strategy and Results
+
+### 1. Read `UNITTEST.md`
+
+Open `UNITTEST.md` at the project root. Bob's strategy document covers:
+- Application architecture summary
+- Testable classes and their responsibilities
+- Naming conventions
+- Test file paths
+- Coverage thresholds (goals, not guarantees)
+- Identified gaps prioritized as P1/P2/P3
+
+### 2. Run the test suite yourself
+
+In Bob's terminal:
+```bash
+mvn clean test
+```
+
+Confirm the same pass rate Bob reported.
+
+### 3. Open the coverage report
+
+```bash
+mvn jacoco:report
+open target/site/jacoco/index.html
+```
+
+Compare package-level coverage numbers to Bob's reported baseline.
+
+### 4. Explore a test file
+
+Open a few generated test files (e.g. `src/test/java/com/pharmacy/repository/PrescriptionRepositoryTest.java`) and note:
+- Use of `@ExtendWith(MockitoExtension.class)`
+- `@Mock` and `@InjectMocks` annotations
+- AssertJ fluent assertions
+
+If repositories use the singleton pattern, look for how Bob mocks it — a common technique is `MockedStatic` combined with reflection to overwrite the private singleton field.
 
 ---
 
 # Conclusion
 
-Congratulations! You've completed the Unit Test Generation lab using Bob's Advanced mode. You should now be able to:
+You've completed the Unit Test Generation lab using Bob V2's Java Unit Testing workflow. You should now be comfortable with:
 
-Use Bob's Advanced mode for comprehensive test creation including:  
-   ✅ Setting up testing infrastructure and dependencies  
-   ✅ Generating unit tests for repositories and data access layers  
-   ✅ Creating tests for REST API endpoints with mocks  
-   ✅ Testing model classes and business logic  
-   ✅ Analyzing and improving code coverage  
-   ✅ Organizing and documenting test suites  
+- ✅ Launching the standalone Java Unit Testing workflow
+- ✅ Configuring the task-selection screen (strategy, tests, coverage)
+- ✅ Reading Bob's cost/time preview with 80% confidence interval
+- ✅ Reviewing the `UNITTEST.md` strategy document
+- ✅ Interpreting the coverage baseline Bob reports at the end
 
-## Key Takeaways
-
-1. **Test Early, Test Often** - Automated tests catch bugs before production
-2. **Comprehensive Coverage** - Test success paths, error paths, and edge cases
-3. **Proper Isolation** - Use mocks to test units in isolation
-4. **Readable Tests** - Clear test names and assertions make maintenance easier
-5. **Fast Execution** - Unit tests should run quickly to encourage frequent execution
-6. **Bob's Testing Expertise** - AI can generate comprehensive test suites efficiently
-
-## Test Suite Achievements
-
-### Coverage Metrics:
-- ✅ **Repository Layer** - 90%+ coverage with comprehensive CRUD tests
-- ✅ **API Layer** - 85%+ coverage with endpoint and error scenario tests
-- ✅ **Model Layer** - 95%+ coverage with data integrity tests
-
-### Test Categories:
-- ✅ **Happy Path Tests** - Verify normal operation
-- ✅ **Error Handling Tests** - Verify proper error responses
-- ✅ **Edge Case Tests** - Verify boundary conditions
-- ✅ **Integration Tests** - Verify component interactions
-
-## Next Steps (Optional)
-
-> **Note:** The following activities are optional and can be explored if you have additional time or want to deepen your understanding of the concepts covered in this lab.
-
-Consider exploring the following testing tasks using Bob:
-
-1. **Performance Testing**
-   
-   Ask Bob:
-   ```
-   Create performance tests that measure:
-   - Response time for API endpoints under load
-   - Repository operation performance with large datasets
-   - Memory usage during concurrent operations
-   
-   Use JMH (Java Microbenchmark Harness) for accurate measurements.
-   ```
-
-2. **Contract Testing**
-   
-   Ask Bob:
-   ```
-   Implement API contract tests using REST Assured to verify:
-   - Request/response schemas
-   - HTTP status codes
-   - Content-Type headers
-   - JSON structure validation
-   ```
-
-3. **Mutation Testing**
-   
-   Ask Bob:
-   ```
-   Add PIT (Mutation Testing) to the project to verify test quality.
-   Configure it in pom.xml and analyze mutation coverage reports.
-   Improve tests based on surviving mutants.
-   ```
-
-4. **Test Data Builders**
-   
-   Ask Bob:
-   ```
-   Create test data builder classes for:
-   - Prescription objects
-   - Order objects
-   - Medicine objects
-   
-   Use the Builder pattern to make test data creation more readable and maintainable.
-   ```
-
-5. **Parameterized Tests**
-   
-   Ask Bob:
-   ```
-   Convert repetitive tests to parameterized tests using JUnit 5's @ParameterizedTest.
-   Focus on tests that verify similar behavior with different inputs.
-   ```
-
-6. **Test Containers (Advanced)**
-   
-   Ask Bob:
-   ```
-   If we add a database in the future, set up Testcontainers for:
-   - Running tests against a real database in Docker
-   - Ensuring tests are isolated and repeatable
-   - Testing database-specific behavior
-   ```
+Ready for Lab 5 (Vulnerabilities Detection) next.
 
 ---
 
-**Thank you for completing this lab!** You've successfully used IBM Bob to generate a comprehensive unit test suite for a Java application. This experience demonstrates how Bob can accelerate test creation while ensuring high quality, maintainability, and coverage. Remember: good tests are the foundation of reliable software!
+## Troubleshooting
+
+### Issue 1: `mvn test` reports "cannot find symbol" or missing classes
+
+**Symptom:** Test classes reference source classes Bob thinks exist but the compile step disagrees.
+
+**Solution:** Stale `.class` files from a prior run can cause this. Run `mvn clean test` (not just `mvn test`) to force a full recompile.
+
+### Issue 2: Some generated tests fail
+
+**Symptom:** After Bob completes, a small number of tests fail on `mvn test`.
+
+**Solution:** Ask Bob in the chat to review and fix the failing tests specifically: "the following tests are failing: [paste output]. Please fix them without changing production code." Bob will iterate on the tests until they pass.
+
+### Issue 3: JaCoCo coverage report doesn't appear
+
+**Symptom:** No `target/site/jacoco/` directory after the run.
+
+**Solution:** Run `mvn clean test jacoco:report`. The coverage report requires the `jacoco:report` goal explicitly.
+
+### Issue 4: Bob's terminal shows the wrong Java version
+
+**Symptom:** `java -version` in Bob's terminal shows 8 instead of 21.
+
+**Solution:** `sdk use java 21.0.11-zulu` in Bob's terminal specifically. `sdk use` is shell-scoped and doesn't apply across terminal tabs.
+
+---
