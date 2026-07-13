@@ -67,29 +67,19 @@ The workflow may recommend a target state that requires additional tools or runt
 
 # Initiating the Java UI Modernization Workflow
 
+The Java UI Modernization workflow provides:
+- Multi-file read and write operations
+- Complex multi-step workflow execution
+- Deep knowledge of legacy Java UI patterns and modern UI modernization approaches
+
 ## Opening the Workspace
 
 1. Open the [`snapC-ui-mod`](snapC-ui-mod) folder in Bob as your active workspace.
 2. Open the Bob Chat interface.
 
-## Switching to Agent Mode
-
-The Java UI Modernization workflow runs in Bob's **Agent mode**, which provides:
-- Multi-file read and write operations
-- Complex multi-step workflow execution
-- Deep knowledge of legacy Java UI patterns and modern UI modernization approaches
-
-**To switch to Agent mode:**
-1. Click on the current mode indicator at the bottom of the Bob chat window.
-2. Select **Agent** from the dropdown.
-
-![agent_mode](images/agent_mode.png)
-
 ## Triggering the Workflow
 
 Press the play button `(▶︎)` in the top right near the settings gear, then press `start` on the Java Modernization workflow.
-
-![go_to_workflow](images/go-to-workflow.png)
 
 Alternatively, in the Bob chat window, you can type the following to start the workflow:
 
@@ -127,37 +117,23 @@ Next, Bob will analyze the application architecture and create documentation in 
 
 Next, Bob will ask you what stack you want to modernize to. For this lab, select:
 - Frontend Framework: `React`
-- Frontend Design System: `Material UI`
+- Frontend Design System: `Carbon Design System`
 - Frontent Project Path: `<path_to_project_root>/Bobathon/labs/lab3-ui-modernization/snapC-ui-mod/src/main/webapp`
 
-- Backend Framework: `Jakarta EE style Rest Services`
+- Backend Framework: `Spring Boot`
 - Backend Project Path: `<path_to_project_root>/Bobathon/labs/lab3-ui-modernization/snapC-ui-mod/src/main/java/com/pharmacy`
 
 And press `Setup Project`
 
-![select_stack](./images/select-stack.png)
-
 From here, Bob will begin the backend migration in a subtask and track progress via a Todo List. You can press the Todo list item bar at the top of the Bob window to expand or minimize the list.
-
-![backend-migration](./images/backend-migration.png)
 
 Bob will run `mvn clean package` to test compilation, identify and debug any errors, fix them, and repeat until the build works.
 
-## 4. Test the new Jakarta EE backend
+## 4. Test the new backend
 
-Bob will prompt you to run `mvn liberty:run`, do so in your terminal.
+Bob will prompt you to run `mvn spring-boot:run`, do so in your terminal.
 
-![run-backend](./images/run-backend.png)
-
-Paste any errors, e.g.
-```
-Server server started in 6.397 seconds.
-[INFO] [ERROR   ] SRVE0321E: The [struts2] filter did not load during start up.
-[INFO] Filter [struts2]: Could not find required filter class - org.apache.struts2.dispatcher.filter.StrutsPrepareAndExecuteFilter.class
-[INFO] [ERROR   ] SRVE0321E: The [com.pharmacy.rest.CorsFilter] filter did not load during start up.
-[INFO] Filter [com.pharmacy.rest.CorsFilter]: com.pharmacy.rest.CorsFilter was found, but is missing another required class.
-```
-into Bob for debugging. When errors are resolved, access the application at http://localhost:9081/simple-pharmacy/api/dashboard.
+Paste any errors into Bob for debugging.
 
 ## 5. Frontend Setup / Scaffolding
 
@@ -167,9 +143,7 @@ You can track Bob's progress through the Todo list at the top:
 
 ![frontend-migration](./images/frontend-migration.png)
 
-When ready, Bob will prompt you to run the frontend via `npm run dev` to check the scaffolding for the project. Run that, then check at http://localhost:3000/ and you should see something like
-
-![frontend-scaffold](./images/frontend-scaffold.png)
+When ready, Bob will prompt you to run the frontend via `npm run dev` to check the scaffolding for the project.
 
 If there are any errors, report them to Bob. If not, say something like: `The scaffold looks good`.
 
@@ -179,13 +153,11 @@ Now Bob will start building out the components then pages for the frontend app. 
 
 If you run into any errors, just paste them into Bob to debug. The end result should look something like this:
 
-![modernized-ui](./images/modernized-UI.png)
+![modernized-ui](./images/ui_after.png)
 
 ## 7. Containerization & Validation
 
 Bob should containerize and validate the final state of modernization
-
-![done](./images/done.png)
 
 ---
 
