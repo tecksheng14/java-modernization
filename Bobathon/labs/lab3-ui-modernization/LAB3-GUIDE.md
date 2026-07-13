@@ -67,27 +67,21 @@ The workflow may recommend a target state that requires additional tools or runt
 
 # Initiating the Java UI Modernization Workflow
 
+The Java UI Modernization workflow provides:
+- Multi-file read and write operations
+- Complex multi-step workflow execution
+- Deep knowledge of legacy Java UI patterns and modern UI modernization approaches
+
 ## Opening the Workspace
 
 1. Open the [`snapC-ui-mod`](snapC-ui-mod) folder in Bob as your active workspace.
 2. Open the Bob Chat interface.
 
-## Switching to Agent Mode
-
-The Java UI Modernization workflow runs in Bob's **Agent mode**, which provides:
-- Multi-file read and write operations
-- Complex multi-step workflow execution
-- Deep knowledge of legacy Java UI patterns and modern UI modernization approaches
-
-**To switch to Agent mode:**
-1. Click on the current mode indicator at the bottom of the Bob chat window.
-2. Select **Agent** from the dropdown.
-
-![agent_mode](images_lab3UImodernization/agent_mode.png)
-
 ## Triggering the Workflow
 
-In the Bob chat window, type the following to start the workflow:
+Press the play button `(▶︎)` in the top right near the settings gear, then press `start` on the Java Modernization workflow.
+
+Alternatively, in the Bob chat window, you can type the following to start the workflow:
 
 ```
 I want to modernize this Java application UI. Help me execute the Java UI Modernization workflow.
@@ -95,159 +89,75 @@ I want to modernize this Java application UI. Help me execute the Java UI Modern
 
 Bob will initiate the Java UI Modernization workflow and begin with the analysis phase.
 
-![ui_workflow](images_lab3UImodernization/ui_workflow.png)
+![ui_workflow](images/ui_workflow.png)
+
 
 ---
 
-# Step-by-Step Exercises
+# Step-by-Step through the workflow
 
-1. **Open Bob Chat**
-   - Click the Bob icon in the IDE sidebar if the chat is not already open.
+## 1. Analyze Project
 
-2. **Switch to Agent Mode**
-   - Click the current mode indicator at the bottom of chat.
-   - Select **Agent** from the dropdown and confirm if prompted.
+Ensure the Project path points to your Java app and press `Continue`. Bob will run an initial build of the app to ensure starting state is working.
 
-3. **Initiate the Workflow**
-   - In the Bob chat, enter:
-     ```
-     I want to modernize this Java application UI. Help me execute the Java UI Modernization workflow.
-     ```
-
-4. **Review the Analysis and Target-State Options**
-
-   Bob will analyze the existing application and present target-state options for modernizing the UI. Review the proposed options and choose the one that best fits your goals for the lab.
-
-![ui_options](images_lab3UImodernization/ui_options.png)
+![analyze](./images/analyze.png)
 
 
-5. **Follow and Guide the Workflow**
+## 2. Select `UI Modernization`
 
-   After selecting a target state, Bob will continue the modernization workflow and ask for your approval at key points. You are encouraged to prompt Bob throughout the process. Useful follow-up prompts include:
-   - Asking Bob to explain a generated file or component
-   - Requesting changes to the layout or structure
-   - Asking Bob to troubleshoot build or runtime errors
-   - Asking for clarification on a modernization decision
+Select UI Modernization type. You can also enable or disable git flow. If selected, Bob will create a new git branch for this modernization automatically. Press `Continue`. 
 
-6. **Start the Backend**
+> Important note: Bob will make git commits automatically as he progresses through the workflow
 
-   Once Bob has generated the modernized UI, start the Liberty backend so you can validate the full application:
+![sel-ui-mod](./images/select-ui-mod.png)
 
-   ```bash
-   # From snapC-ui-mod
-   ./run-liberty.sh       # macOS/Linux
-   run-liberty.bat        # Windows
-   ```
+Next, Bob will analyze the application architecture and create documentation in a subtask.
 
-   See [`README-AUTOMATION.md`](snapC-ui-mod/README-AUTOMATION.md) for full backend startup and stop instructions.
+## 3. Select modernization stack
 
-7. **Validate the Modernized UI**
+Next, Bob will ask you what stack you want to modernize to. For this lab, select:
+- Frontend Framework: `React`
+- Frontend Design System: `Carbon Design System`
+- Frontent Project Path: `<path_to_project_root>/Bobathon/labs/lab3-ui-modernization/snapC-ui-mod/src/main/webapp`
 
-   Once Bob completes the workflow, ask Bob to help run the application:
-   ```
-   Help me run the modernized application UI
-   ```
+- Backend Framework: `Spring Boot`
+- Backend Project Path: `<path_to_project_root>/Bobathon/labs/lab3-ui-modernization/snapC-ui-mod/src/main/java/com/pharmacy`
 
-   If the selected target state requires additional commands or tools, follow the instructions Bob provides for that option.
+And press `Setup Project`
 
-### Expected Outcome
+From here, Bob will begin the backend migration in a subtask and track progress via a Todo List. You can press the Todo list item bar at the top of the Bob window to expand or minimize the list.
 
-- A successfully generated modernized UI based on the selected target-state option
-- Core application pages and navigation working correctly
-- The modernized UI able to retrieve data from the Liberty backend
-- A validated end-to-end modernization result for the selected target state
+Bob will run `mvn clean package` to test compilation, identify and debug any errors, fix them, and repeat until the build works.
 
----
+## 4. Test the new backend
 
-# Troubleshooting
+Bob will prompt you to run `mvn spring-boot:run`, do so in your terminal.
 
-## Issue 1: Workflow Request Failed
+Paste any errors into Bob for debugging.
 
-**Symptom:**
-```
-{"apiProtocol":"openai"}
-```
+## 5. Frontend Setup / Scaffolding
 
-**Solution:**
-Select "Retry" in the Bob chat window.
+Next, Bob will work on configuring the new frontend stack, including creating a new vite react app and installing dependencies.
 
----
+You can track Bob's progress through the Todo list at the top:
 
-## Issue 2: Backend Connection Issues
+![frontend-migration](./images/frontend-migration.png)
 
-**Symptom:**
-The modernized UI cannot connect to the backend API. Errors may include:
-- `HTTP Error: Connection refused`
-- `Failed to load resource: net::ERR_CONNECTION_REFUSED`
-- `CORS policy error`
-- API calls returning 404 or timeout errors
+When ready, Bob will prompt you to run the frontend via `npm run dev` to check the scaffolding for the project.
 
-**Root Cause:**
-The Liberty backend is not running on the expected local endpoint, so the modernized UI cannot retrieve application data.
+If there are any errors, report them to Bob. If not, say something like: `The scaffold looks good`.
 
-### Solution A: Start the Backend
+## 6. Frontend Components & Pages
 
-```bash
-cd snapC-ui-mod
+Now Bob will start building out the components then pages for the frontend app. Bob will periodically run build commands to verify implemenation. Once complete, Bob will ask you to run the app via `npm run dev`, do that and check http://localhost:3000/
 
-# Full build and start (first time or after code changes)
-./run-liberty.sh       # macOS/Linux
-run-liberty.bat        # Windows
+If you run into any errors, just paste them into Bob to debug. The end result should look something like this:
 
-# Quick start (already built)
-./quick-start.sh
-```
+![modernized-ui](./images/ui_after.png)
 
-Verify the backend is up:
-```bash
-curl http://localhost:9081/simple-pharmacy.war/api/dashboard
-```
+## 7. Containerization & Validation
 
-### Solution B: Stop a Stale Server
-
-If port 9081 is already occupied:
-```bash
-./stop-liberty.sh      # macOS/Linux
-stop-liberty.bat       # Windows
-make stop              # using Make
-mvn liberty:stop       # using Maven
-```
-
-### Solution C: Review Target-State Runtime Instructions
-
-If the generated UI does not start or connect correctly, ask Bob to explain the runtime steps for the selected target state and verify that any required configuration, ports, proxies, or environment settings were applied correctly.
-
-### Solution D: CORS Configuration
-
-If CORS errors appear when hitting the backend directly, verify [`src/main/java/com/pharmacy/api/CorsFilter.java`](snapC-ui-mod/src/main/java/com/pharmacy/api/CorsFilter.java) includes:
-
-```java
-response.setHeader("Access-Control-Allow-Origin", "*");
-response.setHeader("Access-Control-Allow-Methods", "GET, POST, PUT, DELETE, OPTIONS");
-response.setHeader("Access-Control-Allow-Headers", "Content-Type, Authorization");
-```
-
-Restart the backend after any CORS changes.
-
-### Verification After Applying a Fix
-
-1. Check the browser console (F12) for remaining errors.
-2. Navigate through the main application pages.
-3. Verify data loads correctly in the modernized UI.
-
----
-
-## Getting Help
-
-### During the Lab
-1. **Ask Bob** — provide the full error message for the most accurate assistance
-2. **Ask Your Instructor** — raise your hand if you are stuck
-3. **Collaborate** — discuss with classmates
-
-### Bob-Specific Tips
-- Be specific — include file names, error text, and what you already tried
-- Ask Bob to explain its reasoning when reviewing generated code
-- Request step-by-step guidance for complex debugging tasks
+Bob should containerize and validate the final state of modernization
 
 ---
 
