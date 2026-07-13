@@ -4,9 +4,8 @@
 
 **Start here:** [GETTING_STARTED.md](Bobathon/GETTING_STARTED.md) - Complete guide to get up and running in 10 minutes!
 
-This repository contains **8 hands-on labs** for learning AI-assisted application modernization:
+This repository contains **6 hands-on labs** for learning AI-assisted application modernization:
 - **6 Java Modernization Labs** - Transform legacy Java applications step-by-step
-- **2 Figma Integration Labs** - Learn to integrate IBM Bob with Figma for UI design
 ---
 
 ## 📑 Table of Contents
@@ -25,9 +24,6 @@ This repository contains **8 hands-on labs** for learning AI-assisted applicatio
     - [Lab 4: Unit Test Generation](#lab-4-unit-test-generation)
     - [Lab Alt-4: Test Driven Development (TDD)](#lab-alt-4-test-driven-development-tdd)
     - [Lab 5: Security Vulnerability Remediation](#lab-5-security-vulnerability-remediation)
-  - [Figma Integration Labs](#figma-integration-labs)
-    - [Figma-Editor: Integration with Editor Access](#figma-editor-integration-with-editor-access)
-    - [Figma-NonEditor: Integration without Editor Access](#figma-noneditor-integration-without-editor-access)
 - [Templates & Resources](#templates--resources)
 - [Getting Started](#getting-started)
   - [Prerequisites](#prerequisites)
@@ -130,7 +126,9 @@ This workshop guides you through modernizing a **Simple Pharmacy Management Syst
 
 ## Workshop Structure
 
-This workshop contains **8 hands-on labs** covering Java modernization and Figma integration. Each lab is self-contained with its own starting point. The Java labs (1-5) can follow a sequential modernization path or be completed independently.
+This workshop contains **6 hands-on labs** covering Java modernization.
+
+Each lab is self-contained with its own starting point. The Java labs (1-5) can follow a sequential modernization path or be completed independently.
 
 ### Lab Overview
 
@@ -144,14 +142,6 @@ This workshop contains **8 hands-on labs** covering Java modernization and Figma
 | **Lab 4** | Unit Test Generation | `snapD-unit-test-gen` | Liberty, Java 21, Angular | 60-75 min | ✅ Available |
 | **Lab Alt-4** | Test Driven Development (TDD) | `snapTDD` | OpenAPI → Java 21 REST API | 45-60 min | ✅ Available |
 | **Lab 5** | Security Vulnerability Remediation | `snapE-security-vulnerabilities` | Liberty, Java 21, Angular | 60-75 min | ✅ Available |
-
-#### Figma Integration Labs
-
-| Lab | Focus Area | Requirements | Duration | Status |
-|-----|-----------|--------------|----------|--------|
-| **Figma-Editor** | Figma Integration with Editor Access | Figma account + editor permissions | 30-45 min | ✅ Available |
-| **Figma-NonEditor** | Figma Integration without Editor Access | Figma account + read access | 30-45 min | ✅ Available |
-
 
 [↑ Back to Top](#bobathon---java-modernization-labs)
 
@@ -299,67 +289,6 @@ This workshop contains **8 hands-on labs** covering Java modernization and Figma
 - **After:** Liberty Runtime, Java 21, Angular (security-hardened)
 
 **📘 [View Lab 5 Guide](Bobathon/labs/lab5-security-vulnerability-remediation/LAB5-GUIDE.md)**
-
-[↑ Back to Top](#bobathon---java-modernization-labs)
-
----
-
-## Figma Integration Labs
-
-### Figma-Editor: Integration with Editor Access
-**Learn Figma Integration with Full Editor Permissions**
-
-**Objective:** Learn how to integrate IBM Bob with Figma when you have editor access to design files. Use IBM Bob to read, analyze, and modify Figma designs programmatically.
-
-**What You'll Learn:**
-- Connecting IBM Bob to Figma with editor permissions
-- Using IBM Bob to interact with Figma designs
-- Understanding the Model Context Protocol (MCP) for Figma
-- Automating design tasks with AI assistance
-- Making programmatic changes to Figma files
-
-**Prerequisites:**
-- IBM Bob installed
-- Figma account (free or paid)
-- Editor access to a Figma design file
-
-**Duration:** 30-45 minutes
-
-**📘 [View Figma-Editor Guide](Figma-Editor/README.md)**
-
-**Lab Files:** `Figma-Editor/` folder contains PDF guide and resources
-
-[↑ Back to Top](#bobathon---java-modernization-labs)
-
----
-
-### Figma-NonEditor: Integration without Editor Access
-**Learn Figma Integration with Read-Only Access**
-
-**Objective:** Learn how to integrate IBM Bob with Figma when you only have read access to design files. Use IBM Bob to analyze designs, extract specifications, and build applications based on Figma designs.
-
-**What You'll Learn:**
-- Connecting IBM Bob to Figma with read-only access
-- Analyzing Figma designs programmatically
-- Extracting design specifications and assets
-- Building applications from Figma designs
-- Working with design data in your development workflow
-
-**What You'll Build:**
-- A Pill Tracker application based on Figma designs
-- Complete with HTML, CSS, JavaScript, and database integration
-
-**Prerequisites:**
-- IBM Bob installed
-- Figma account (free or paid)
-- Read access to a Figma design file
-- Basic web development knowledge
-
-**Duration:** 30-45 minutes
-
-**📘 [View Figma-NonEditor Guide](Figma-NonEditor/README.md)**
-
-**Lab Files:** `Figma-NonEditor/` folder contains PDF guide, code, and Docker setup
 
 [↑ Back to Top](#bobathon---java-modernization-labs)
 

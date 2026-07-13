@@ -1,4 +1,4 @@
-# IBM Bob AI Copilot - Lab 3: Java UI Modernization Workflow
+# IBM Bob - Java UI Modernization Workflow
 ## Simple Pharmacy — Legacy UI Modernization
 
 ---
