@@ -453,13 +453,13 @@ Each lab has a **snapshot** - a self-contained starting point with all necessary
 
 By completing these labs, you will:
 
-✅ Understand IBM Bob's AI-powered modernization capabilities
-✅ Master the Java Modernization workflow
-✅ Learn to migrate between application servers
-✅ Upgrade Java applications to modern versions
-✅ Transform legacy frontends to modern frameworks
-✅ Validate and test modernized applications
-✅ Apply best practices for Java modernization projects
+- Understand IBM Bob's AI-powered modernization capabilities
+- Master the Java Modernization workflow
+- Learn to migrate between application servers
+- Upgrade Java applications to modern versions
+- Transform legacy frontends to modern frameworks
+- Validate and test modernized applications
+- Apply best practices for Java modernization projects
 
 [↑ Back to Top](#bobathon---java-modernization-labs)
 

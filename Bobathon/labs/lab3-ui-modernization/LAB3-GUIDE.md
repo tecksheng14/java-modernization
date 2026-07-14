@@ -145,19 +145,40 @@ You can track Bob's progress through the Todo list at the top:
 
 When ready, Bob will prompt you to run the frontend via `npm run dev` to check the scaffolding for the project.
 
-If there are any errors, report them to Bob. If not, say something like: `The scaffold looks good`.
+![frontend-only](./images/frontend_only.png)
 
-## 6. Frontend Components & Pages
 
-Now Bob will start building out the components then pages for the frontend app. Bob will periodically run build commands to verify implemenation. Once complete, Bob will ask you to run the app via `npm run dev`, do that and check http://localhost:3000/
+## 6. Frontend and Backend Integration
 
-If you run into any errors, just paste them into Bob to debug. The end result should look something like this:
+Now Bob will wire the existing frontend components and pages to the backend REST API endpoints. Bob will periodically run build commands to verify the integration. Once complete, run both the backend and frontend together to validate the full end-to-end connection.
+
+### Start the Backend
+
+In a **first terminal**, navigate to the project root and start the Spring Boot backend:
+
+```bash
+mvn spring-boot:run
+```
+
+Wait until you see the server started message (typically on port `8080`) before starting the frontend.
+
+### Start the Frontend
+
+In a **second terminal**, navigate to the frontend directory and start the Vite dev server:
+
+```bash
+npm run dev
+```
+
+Then open your browser at http://localhost:3000/ (or the port shown in the terminal output).
+
+If you run into any errors in either terminal, paste them into Bob to debug. The end result should look something like this:
 
 ![modernized-ui](./images/ui_after.png)
 
-## 7. Containerization & Validation
+## 7. Validation
 
-Bob should containerize and validate the final state of modernization
+Bob should continute to validate the final state of modernization
 
 ---
 
