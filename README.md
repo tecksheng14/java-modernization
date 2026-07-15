@@ -1,5 +1,7 @@
 # Bobathon - Java Modernization Labs
 
+> **📥 Download Bob:** [bob.ibm.com](https://bob.ibm.com/)
+
 ## 🚀 New to This Repository?
 
 **Start here:** [GETTING_STARTED.md](Bobathon/GETTING_STARTED.md) - Complete guide to get up and running in 10 minutes!
@@ -453,13 +455,13 @@ Each lab has a **snapshot** - a self-contained starting point with all necessary
 
 By completing these labs, you will:
 
-- Understand IBM Bob's AI-powered modernization capabilities
-- Master the Java Modernization workflow
-- Learn to migrate between application servers
-- Upgrade Java applications to modern versions
-- Transform legacy frontends to modern frameworks
-- Validate and test modernized applications
-- Apply best practices for Java modernization projects
+✅ Understand IBM Bob's AI-powered modernization capabilities
+✅ Master the Java Modernization workflow
+✅ Learn to migrate between application servers
+✅ Upgrade Java applications to modern versions
+✅ Transform legacy frontends to modern frameworks
+✅ Validate and test modernized applications
+✅ Apply best practices for Java modernization projects
 
 [↑ Back to Top](#bobathon---java-modernization-labs)
 
@@ -497,7 +499,7 @@ By completing these labs, you will:
 ## Additional Resources
 
 ### Documentation
-- [IBM Bob Documentation](https://www.ibm.com/products/watsonx-code-assistant)
+- [IBM Bob Documentation](https://bob.ibm.com/docs/ide)
 - [Liberty Documentation](https://openliberty.io/docs/)
 - [Java 21 Release Notes](https://openjdk.org/projects/jdk/21/)
 - [Angular Documentation](https://angular.io/docs)

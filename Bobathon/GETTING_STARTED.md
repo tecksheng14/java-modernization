@@ -182,7 +182,7 @@ Every Java lab follows this pattern:
 
 ### Install IBM Bob
 
-1. Download IBM Bob from [IBM website](https://www.ibm.com/products/watsonx-code-assistant)
+1. Download IBM Bob from [IBM website](https://bob.ibm.com/)
 2. Install the IDE extension for your editor:
    - VS Code: Install from Extensions marketplace
    - IntelliJ: Install from Plugins marketplace
