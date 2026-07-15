@@ -574,7 +574,7 @@ By completing these labs, you will:
 ## Additional Resources
 
 ### Documentation
-- [IBM Bob Documentation](https://www.ibm.com/products/watsonx-code-assistant)
+- [IBM Bob Documentation](https://bob.ibm.com/docs/ide)
 - [Liberty Documentation](https://openliberty.io/docs/)
 - [Java 21 Release Notes](https://openjdk.org/projects/jdk/21/)
 - [Angular Documentation](https://angular.io/docs)
